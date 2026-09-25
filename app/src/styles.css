@@ -1,0 +1,42 @@
+@import 'tailwindcss';
+@import './base.css';
+
+/* Fallback values only - App.tsx always overrides these per preview panel
+   via inline style, so the exact numbers here don't matter. */
+@theme {
+    --color-c-primary: #e1c385;
+    --color-c-on-primary: #3f2e00;
+    --color-c-primary-container: #584412;
+    --color-c-on-primary-container: #fedf9f;
+    --color-c-secondary: #92ccff;
+    --color-c-on-secondary: #003351;
+    --color-c-secondary-container: #004b73;
+    --color-c-on-secondary-container: #cce5ff;
+    --color-c-tertiary: #e1b6ff;
+    --color-c-on-tertiary: #4c007b;
+    --color-c-tertiary-container: #691a9f;
+    --color-c-on-tertiary-container: #f2daff;
+    --color-c-error: #ffb4ab;
+    --color-c-on-error: #690005;
+    --color-c-error-container: #93000a;
+    --color-c-on-error-container: #ffdad6;
+    --color-c-success: #91d888;
+    --color-c-on-success: #003908;
+    --color-c-success-container: #0b5314;
+    --color-c-on-success-container: #acf4a2;
+    --color-c-surface: #151310;
+    --color-c-on-surface: #e7e1dc;
+    --color-c-on-surface-variant: #cdc5bc;
+    --color-c-surface-container-lowest: #100e0b;
+    --color-c-surface-container-low: #1d1b18;
+    --color-c-surface-container: #211f1c;
+    --color-c-surface-container-high: #2c2a27;
+    --color-c-surface-container-highest: #373431;
+    --color-c-surface-dim: #151310;
+    --color-c-surface-bright: #3b3935;
+    --color-c-outline: #969087;
+    --color-c-outline-variant: #4b463f;
+    --color-c-inverse-surface: #e7e1dc;
+    --color-c-inverse-on-surface: #32302d;
+    --color-c-inverse-primary: #725b28;
+}

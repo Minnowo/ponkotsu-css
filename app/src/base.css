@@ -1,0 +1,202 @@
+
+@theme {
+    --radius-sm: 4px;
+    --radius-md: 8px;
+}
+
+@layer base {
+    html {
+        -webkit-text-size-adjust: 100%;
+    }
+
+    body {
+        color: var(--color-c-on-surface);
+        background-color: var(--color-c-surface);
+        line-height: 1.5;
+    }
+
+    h1, h2, h3, h4, h5, h6 {
+        font-weight: 500;
+        color: var(--color-c-on-surface);
+    }
+    h1 { @apply text-3xl mb-4; }
+    h2 { @apply text-2xl mb-3; }
+    h3 { @apply text-xl mb-2; }
+    h4, h5, h6 { @apply text-lg mb-2; }
+
+    p {
+        @apply mb-3;
+    }
+
+    small {
+        color: var(--color-c-on-surface-variant);
+    }
+
+    a {
+        color: var(--color-c-primary);
+        text-decoration: none;
+        @apply std-focus;
+    }
+    a:hover {
+        text-decoration: underline;
+    }
+
+    hr {
+        border: none;
+        border-top: 1px solid var(--color-c-outline-variant);
+        @apply my-4;
+    }
+
+    code, pre {
+        font-family: ui-monospace, monospace;
+        background: var(--color-c-surface-container-low);
+        @apply rounded-sm;
+    }
+    code {
+        @apply px-1 py-0.5 text-sm;
+    }
+    pre {
+        @apply p-3 overflow-x-auto;
+    }
+    pre code {
+        background: transparent;
+        padding: 0;
+    }
+
+    table {
+        border-collapse: collapse;
+        width: 100%;
+    }
+    th, td {
+        border: 1px solid var(--color-c-outline-variant);
+        @apply px-2 py-1 text-left;
+    }
+    th {
+        background: var(--color-c-surface-container);
+        font-weight: 500;
+    }
+
+    fieldset {
+        border: 1px solid var(--color-c-outline-variant);
+        @apply rounded-md p-3;
+    }
+    legend {
+        color: var(--color-c-on-surface-variant);
+        @apply px-1 text-sm;
+    }
+
+    label {
+        color: var(--color-c-on-surface);
+        @apply text-sm font-medium;
+    }
+
+    input, select, textarea, button {
+        @apply input-like;
+    }
+    button {
+        @apply hover:cursor-pointer;
+    }
+
+    input[type="checkbox"], input[type="radio"], input[type="range"] {
+        all: revert;
+        accent-color: var(--color-c-primary);
+        @apply hover:cursor-pointer std-focus;
+    }
+    input[type="checkbox"]:disabled, input[type="radio"]:disabled, input[type="range"]:disabled {
+        @apply cursor-not-allowed opacity-60;
+    }
+
+    ::selection {
+        background: var(--color-c-primary-container);
+        color: var(--color-c-on-primary-container);
+    }
+}
+
+@utility std-focus {
+    @apply focus-visible:outline-solid
+        focus-visible:outline-2
+        focus-visible:outline-c-primary
+        focus-visible:outline-offset-2;
+}
+
+@utility input-like {
+    @apply text-c-on-surface
+        bg-c-surface-container-low
+
+        rounded-sm
+        px-2
+        py-1
+        border
+        border-c-outline
+        hover:border-c-primary
+        focus:border-c-primary
+        focus:outline-none
+        focus-within:border-c-primary
+        focus-within:outline-none
+        std-focus
+
+        disabled:bg-c-surface-container
+        disabled:text-c-on-surface-variant
+        disabled:border-c-outline-variant
+        disabled:cursor-not-allowed
+        disabled:opacity-60
+
+        aria-disabled:bg-c-surface-container
+        aria-disabled:text-c-on-surface-variant
+        aria-disabled:border-c-outline-variant
+        aria-disabled:cursor-not-allowed
+        aria-disabled:opacity-60;
+}
+
+/*
+ * No surface-0: the page background is `surface`, set on <body>.
+ * surface-1 = surface-container-low     (first box on the page)
+ * surface-2 = surface-container         (nested inside a surface-1)
+ * surface-3 = surface-container-high    (nested inside that)
+ * surface-4 = surface-container-highest (deepest; MD3's card default)
+ */
+@utility surface-1 {
+    background: var(--color-c-surface-container-low);
+    @apply text-c-on-surface border border-c-outline-variant rounded-md p-3;
+}
+@utility surface-2 {
+    background: var(--color-c-surface-container);
+    @apply text-c-on-surface border border-c-outline-variant rounded-md p-3;
+}
+@utility surface-3 {
+    background: var(--color-c-surface-container-high);
+    @apply text-c-on-surface border border-c-outline-variant rounded-md p-3;
+}
+@utility surface-4 {
+    background: var(--color-c-surface-container-highest);
+    @apply text-c-on-surface border border-c-outline-variant rounded-md p-3;
+}
+
+/* For a box that should sit flush with the page (no tone step) but still
+   needs a drawn boundary. Prefer surface-1..4 for anything that's stacked. */
+@utility surface-outlined {
+    background: var(--color-c-surface);
+    border: 1px solid var(--color-c-outline-variant);
+    @apply text-c-on-surface rounded-md p-3;
+}
+
+/* Filled buttons: pick a variant class instead of restyling from scratch. */
+@utility btn-filled {
+    @apply px-3 py-1 rounded font-medium hover:cursor-pointer
+        disabled:opacity-38 disabled:cursor-not-allowed;
+}
+@utility btn-primary {
+    @apply btn-filled bg-c-primary text-c-on-primary;
+}
+@utility btn-secondary {
+    @apply btn-filled bg-c-secondary text-c-on-secondary;
+}
+@utility btn-tertiary {
+    @apply btn-filled bg-c-tertiary text-c-on-tertiary;
+}
+@utility btn-error {
+    @apply btn-filled bg-c-error text-c-on-error;
+}
+@utility btn-success {
+    @apply btn-filled bg-c-success text-c-on-success;
+}

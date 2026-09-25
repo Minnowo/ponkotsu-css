@@ -1,0 +1,10 @@
+This directory vendors color-science source files (HCT color space, CAM16,
+tonal palette generation) copied from Google's material-color-utilities:
+
+  https://github.com/material-foundation/material-color-utilities
+
+Vendored under vendor/. Original files are licensed under the Apache
+License, Version 2.0 (see LICENSE-vendor) and are unmodified except where
+noted in a file's header comment.
+
+Copyright 2021 Google LLC
