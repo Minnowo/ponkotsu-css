@@ -1,6 +1,6 @@
 import type {JSX} from 'preact';
 import {useMemo, useState} from 'preact/hooks';
-import {buildScheme, corePaletteFromSeeds, successPalette} from '../../build/src/scheme.js';
+import {buildScheme, corePaletteFromSeeds} from '../../build/src/scheme.js';
 import type {Roles, Seeds} from '../../build/src/scheme.js';
 import baseCss from './base.css?raw';
 
@@ -33,6 +33,56 @@ function ColorField({label, value, onChange}: {label: string; value: string; onC
   );
 }
 
+const CATEGORICAL_BASE_NAMES = [
+  'pink', 'red', 'yellow', 'green', 'blue',
+];
+
+// Each base name has a vivid/dark variant and a pale/light variant (see
+// WHEEL_TONE in scheme.ts) - grouped dark-half/light-half here rather than
+// interleaved, which read better than alternating dark/pale/dark/pale.
+const CATEGORICAL_NAMES = [
+  ...CATEGORICAL_BASE_NAMES,
+  ...CATEGORICAL_BASE_NAMES.map((name) => `${name}-pale`),
+];
+
+// Quick visual gut-check for how a set of categorical colors read together
+// (e.g. as pie chart slices) rather than as isolated swatches.
+function CategoricalPieChart({names}: {names: string[]}) {
+  const slice = 100 / names.length;
+  const stops = names.map(
+      (name, i) => `var(--color-c-${name}) ${i * slice}% ${(i + 1) * slice}%`,
+  ).join(', ');
+  return (
+    <div
+      class="h-40 w-40 rounded-full"
+      style={{background: `conic-gradient(${stops})`} as JSX.CSSProperties}
+    />
+  );
+}
+
+function CategoricalSwatches({names}: {names: string[]}) {
+  return (
+    <div class="flex flex-wrap gap-2">
+      {names.map((name) => (
+        <div key={name} class="flex flex-col items-center gap-1">
+          <div
+            class="h-8 w-14 rounded-sm flex items-center justify-center text-xs font-medium"
+            style={
+              {
+                background: `var(--color-c-${name})`,
+                color: `var(--color-c-on-${name})`,
+              } as JSX.CSSProperties
+            }
+          >
+            Aa
+          </div>
+          <span class="text-c-on-surface-variant text-xs">{name}</span>
+        </div>
+      ))}
+    </div>
+  );
+}
+
 function ThemePreview({title, roles}: {title: string; roles: Roles}) {
   const style = toCssVars(roles) as unknown as JSX.CSSProperties;
   return (
@@ -42,13 +92,61 @@ function ThemePreview({title, roles}: {title: string; roles: Roles}) {
       <section class="flex flex-col gap-2">
         <h3>Buttons</h3>
         <div class="flex flex-wrap gap-2">
+          <button>Regular</button>
           <button class="btn-primary">Primary</button>
           <button class="btn-secondary">Secondary</button>
           <button class="btn-tertiary">Tertiary</button>
-          <button class="btn-error">Delete</button>
-          <button class="btn-success">Save</button>
+          <button class="btn-error">Error</button>
+          <button class="btn-success">Success</button>
+        </div>
+        <div class="flex flex-wrap gap-2">
+          <button disabled>Regular</button>
           <button class="btn-primary" disabled>
-            Disabled
+            Primary
+          </button>
+          <button class="btn-secondary" disabled>
+            Secondary
+          </button>
+          <button class="btn-tertiary" disabled>
+            Tertiary
+          </button>
+          <button class="btn-error" disabled>
+            Error
+          </button>
+          <button class="btn-success" disabled>
+            Success
+          </button>
+        </div>
+      </section>
+
+      <section class="flex flex-col gap-2">
+        <h3>Outlined buttons</h3>
+        <div class="flex flex-wrap gap-2">
+          <button class="btn-outlined">Neutral</button>
+          <button class="btn-outlined-primary">Primary</button>
+          <button class="btn-outlined-secondary">Secondary</button>
+          <button class="btn-outlined-tertiary">Tertiary</button>
+          <button class="btn-outlined-error">Error</button>
+          <button class="btn-outlined-success">Success</button>
+        </div>
+        <div class="flex flex-wrap gap-2">
+          <button class="btn-outlined" disabled>
+            Neutral
+          </button>
+          <button class="btn-outlined-primary" disabled>
+            Primary
+          </button>
+          <button class="btn-outlined-secondary" disabled>
+            Secondary
+          </button>
+          <button class="btn-outlined-tertiary" disabled>
+            Tertiary
+          </button>
+          <button class="btn-outlined-error" disabled>
+            Error
+          </button>
+          <button class="btn-outlined-success" disabled>
+            Success
           </button>
         </div>
       </section>
@@ -64,10 +162,6 @@ function ThemePreview({title, roles}: {title: string; roles: Roles}) {
           </span>
           <span class="rounded-sm px-2 py-1 bg-c-tertiary-container text-c-on-tertiary-container">
             Tertiary container
-          </span>
-          <span class="rounded-sm px-2 py-1 bg-c-error-container text-c-on-error-container">Error container</span>
-          <span class="rounded-sm px-2 py-1 bg-c-success-container text-c-on-success-container">
-            Success container
           </span>
         </div>
 
@@ -176,6 +270,17 @@ function ThemePreview({title, roles}: {title: string; roles: Roles}) {
           <div class="h-6 w-16 rounded-sm border-2 border-c-outline-variant" />
         </div>
       </section>
+
+      <section class="flex flex-col gap-2">
+        <h3>Categorical (charts / tags)</h3>
+        <p class="text-c-on-surface-variant text-xs mb-0">
+          Fixed hues, harmonized toward primary - distinct from each other, related to the theme. Each color has a
+          vivid/dark and a pale/light variant (dark half of the wheel, then the light half). error/success alias
+          red/green from this set (see below).
+        </p>
+        <CategoricalSwatches names={CATEGORICAL_NAMES} />
+        <CategoricalPieChart names={CATEGORICAL_NAMES} />
+      </section>
     </div>
   );
 }
@@ -189,22 +294,19 @@ export function App() {
 
   const {light, dark} = useMemo(() => {
     const core = corePaletteFromSeeds(seeds);
-    const success = successPalette();
     return {
-      light: buildScheme(core, success, false),
-      dark: buildScheme(core, success, true),
+      light: buildScheme(core, seeds, false),
+      dark: buildScheme(core, seeds, true),
     };
   }, [seeds]);
 
   const [font, setFont] = useState<'M PLUS 1' | 'M PLUS 2'>('M PLUS 1');
   const [copied, setCopied] = useState(false);
-  // Mirrors generate.ts's output - see the comment it emits for why this
-  // import line ships commented out rather than active.
+  // Mirrors generate.ts's output.
   const cssText =
-      `/* Uncomment if this is going into an empty stylesheet; leave commented\n` +
-      `   if you already have "@import 'tailwindcss';" above where you paste this. */\n` +
-      `/* @import 'tailwindcss'; */\n\n` +
-      `@theme {\n${toCssText(dark, '    ')}\n}\n\n[data-theme='light'] {\n${toCssText(light, '    ')}\n}\n\n${baseCss}`;
+      `@import 'tailwindcss';\n\n` +
+      `@theme {\n    --color-*: initial;\n${toCssText(dark, '    ')}\n}\n\n` +
+      `[data-theme='light'] {\n${toCssText(light, '    ')}\n}\n\n${baseCss}`;
 
   const copyCss = async () => {
     await navigator.clipboard.writeText(cssText);

@@ -51,11 +51,12 @@ Every color is `c-<role>`, used like any Tailwind color: `bg-c-primary`,
 | `primary` / `on-primary` | your main buttons, links, the active nav item |
 | `secondary` / `on-secondary` | less important actions than primary |
 | `tertiary` / `on-tertiary` | an accent, used sparingly (badges, highlights) |
-| `error` / `on-error` | destructive stuff (delete) |
-| `success` / `on-success` | confirming stuff (save, done) |
 | `*-container` / `on-*-container` | a softer fill version of any of the above (e.g. `primary-container`) |
 | `surface`, `on-surface`, `on-surface-variant` | page background and its text |
 | `outline`, `outline-variant` | borders and dividers |
+| `error` / `on-error` | destructive stuff (delete) |
+| `success` / `on-success` | confirming stuff (save, done) |
+| `rosewater`, `flamingo`, `pink`, `mauve`, `red`, `maroon`, `peach`, `yellow`, `green`, `teal`, `sky`, `sapphire`, `blue`, `lavender` (also includes a `on-<name>` for each) | a set of 14 colors that stay distinct from each other no matter your seed colors |
 
 **The one rule**: only put `on-X` text on an `X` background. `on-primary`
 text goes on `primary`, never on `surface` or anything else. Mixing them
@@ -81,7 +82,8 @@ time you nest one box inside another:
 slightly different shade, so nested boxes stay visually distinct without
 you thinking about which color to use.
 
-**Buttons**: pick the one that matches what the button does.
+**Buttons**: pick the one that matches what the button does. Filled for the
+main action, outlined for a lower-emphasis one next to it.
 
 | Class | Use it for |
 |---|---|
@@ -90,6 +92,8 @@ you thinking about which color to use.
 | `btn-tertiary` | a contrasting accent action |
 | `btn-error` | delete / destructive |
 | `btn-success` | save / confirm |
+| `btn-outlined` | neutral, lower-emphasis (border + text, no fill) |
+| `btn-outlined-primary` / `-secondary` / `-tertiary` / `-error` / `-success` | same, colored |
 
 That's basically the whole system: pick a `surface-N` for boxes, pick a
 `btn-*` for buttons, use `c-*` colors when you need something more

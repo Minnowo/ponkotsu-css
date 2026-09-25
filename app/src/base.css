@@ -93,8 +93,18 @@
     input, select, textarea, button {
         @apply input-like;
     }
+    /* Same MD3 state layer as btn-* (see the comment above btn-filled) -
+       a plain <button> with no color variant is still a button, and
+       should still show it's clickable the same way. */
     button {
-        @apply hover:cursor-pointer;
+        /* Overrides input-like's hover/focus border change - a button's
+           state layer below is the whole affordance, MD3 doesn't also
+           swap the border color on a button the way it does for a text
+           field. */
+        @apply enabled:hover:cursor-pointer
+            enabled:hover:border-c-outline enabled:focus:border-c-outline enabled:focus-within:border-c-outline
+            enabled:hover:[background-color:color-mix(in_oklab,var(--color-c-on-surface)_8%,var(--color-c-surface-container-low))]
+            enabled:focus-visible:[background-color:color-mix(in_oklab,var(--color-c-on-surface)_12%,var(--color-c-surface-container-low))];
     }
 
     input[type="checkbox"], input[type="radio"], input[type="range"] {
@@ -107,8 +117,8 @@
     }
 
     ::selection {
-        background: var(--color-c-primary-container);
-        color: var(--color-c-on-primary-container);
+        background: var(--color-c-primary);
+        color: var(--color-c-on-primary);
     }
 }
 
@@ -120,7 +130,18 @@
 }
 
 @utility input-like {
+    /* text-base font-normal: fixed, not left to inherit - otherwise every
+       field's rendered size/weight depends on whatever ambient text-*
+       class happens to be active on its parent container, which drifts
+       silently from page to page. MD3 calls this "Body Large" (16px/400)
+       for text field input.
+       Hover/focus signal via border-color, not a fill-tint - matches MD3's
+       outlined text field: hover strengthens to on-surface, focus becomes
+       primary. Buttons use a fill-tint state layer instead (see btn-filled
+       and the button rule below) - different mechanism because a button
+       has a fill to tint and a field doesn't. */
     @apply text-c-on-surface
+        text-base font-normal
         bg-c-surface-container-low
 
         rounded-sm
@@ -128,10 +149,10 @@
         py-1
         border
         border-c-outline
-        hover:border-c-primary
-        focus:border-c-primary
+        enabled:hover:border-c-on-surface
+        enabled:focus:border-c-primary
+        enabled:focus-within:border-c-primary
         focus:outline-none
-        focus-within:border-c-primary
         focus-within:outline-none
         std-focus
 
@@ -145,7 +166,8 @@
         aria-disabled:text-c-on-surface-variant
         aria-disabled:border-c-outline-variant
         aria-disabled:cursor-not-allowed
-        aria-disabled:opacity-60;
+        aria-disabled:opacity-60
+        aria-disabled:pointer-events-none;
 }
 
 /*
@@ -181,22 +203,88 @@
 }
 
 /* Filled buttons: pick a variant class instead of restyling from scratch. */
+/*
+ * MD3 "state layer": hover/focus on a filled button isn't an outline or a
+ * fixed lighten/darken - it's a translucent tint of the button's own on-*
+ * color blended into its fill (8% for hover, 12% for focus/press). Because
+ * the tint is the ON color, this correctly lightens light-text-on-dark
+ * buttons and darkens dark-text-on-light ones, whichever the variant is,
+ * with no per-variant branching needed elsewhere. border-none: buttons
+ * still pick up input-like's border from the base `button` rule otherwise.
+ */
 @utility btn-filled {
-    @apply px-3 py-1 rounded font-medium hover:cursor-pointer
+    /* enabled:, not just hover:/focus-visible: on the color variants below -
+       plain :hover still matches a disabled element if the pointer is over
+       it (disabled only blocks click/focus, not CSS hover), so without this
+       a disabled button would still tint on hover. pointer-events-none
+       would also stop that, but it stops the disabled cursor from showing
+       too - enabled: only touches the state-layer, cursor-not-allowed still
+       works normally. */
+    @apply px-3 py-1 rounded font-medium border-none enabled:hover:cursor-pointer
         disabled:opacity-38 disabled:cursor-not-allowed;
 }
 @utility btn-primary {
-    @apply btn-filled bg-c-primary text-c-on-primary;
+    @apply btn-filled bg-c-primary text-c-on-primary
+        enabled:hover:[background-color:color-mix(in_oklab,var(--color-c-on-primary)_8%,var(--color-c-primary))]
+        enabled:focus-visible:[background-color:color-mix(in_oklab,var(--color-c-on-primary)_12%,var(--color-c-primary))];
 }
 @utility btn-secondary {
-    @apply btn-filled bg-c-secondary text-c-on-secondary;
+    @apply btn-filled bg-c-secondary text-c-on-secondary
+        enabled:hover:[background-color:color-mix(in_oklab,var(--color-c-on-secondary)_8%,var(--color-c-secondary))]
+        enabled:focus-visible:[background-color:color-mix(in_oklab,var(--color-c-on-secondary)_12%,var(--color-c-secondary))];
 }
 @utility btn-tertiary {
-    @apply btn-filled bg-c-tertiary text-c-on-tertiary;
+    @apply btn-filled bg-c-tertiary text-c-on-tertiary
+        enabled:hover:[background-color:color-mix(in_oklab,var(--color-c-on-tertiary)_8%,var(--color-c-tertiary))]
+        enabled:focus-visible:[background-color:color-mix(in_oklab,var(--color-c-on-tertiary)_12%,var(--color-c-tertiary))];
 }
 @utility btn-error {
-    @apply btn-filled bg-c-error text-c-on-error;
+    @apply btn-filled bg-c-error text-c-on-error
+        enabled:hover:[background-color:color-mix(in_oklab,var(--color-c-on-error)_8%,var(--color-c-error))]
+        enabled:focus-visible:[background-color:color-mix(in_oklab,var(--color-c-on-error)_12%,var(--color-c-error))];
 }
 @utility btn-success {
-    @apply btn-filled bg-c-success text-c-on-success;
+    @apply btn-filled bg-c-success text-c-on-success
+        enabled:hover:[background-color:color-mix(in_oklab,var(--color-c-on-success)_8%,var(--color-c-success))]
+        enabled:focus-visible:[background-color:color-mix(in_oklab,var(--color-c-on-success)_12%,var(--color-c-success))];
+}
+
+/*
+ * MD3's medium-emphasis variant: colored border + colored text, no fill.
+ * Same state-layer idea as btn-filled, just blended into transparent
+ * instead of into a solid fill. btn-outlined alone is the neutral default
+ * (MD3's actual base "Outlined Button" isn't tied to a color); the color
+ * suffixes are this app's own extension, same pattern as btn-filled's.
+ */
+@utility btn-outlined {
+    @apply px-3 py-1 rounded font-medium bg-transparent border enabled:hover:cursor-pointer
+        border-c-outline text-c-on-surface
+        enabled:hover:[background-color:color-mix(in_oklab,var(--color-c-on-surface)_8%,transparent)]
+        enabled:focus-visible:[background-color:color-mix(in_oklab,var(--color-c-on-surface)_12%,transparent)]
+        disabled:opacity-38 disabled:cursor-not-allowed;
+}
+@utility btn-outlined-primary {
+    @apply btn-outlined border-c-primary text-c-primary
+        enabled:hover:[background-color:color-mix(in_oklab,var(--color-c-primary)_8%,transparent)]
+        enabled:focus-visible:[background-color:color-mix(in_oklab,var(--color-c-primary)_12%,transparent)];
+}
+@utility btn-outlined-secondary {
+    @apply btn-outlined border-c-secondary text-c-secondary
+        enabled:hover:[background-color:color-mix(in_oklab,var(--color-c-secondary)_8%,transparent)]
+        enabled:focus-visible:[background-color:color-mix(in_oklab,var(--color-c-secondary)_12%,transparent)];
+}
+@utility btn-outlined-tertiary {
+    @apply btn-outlined border-c-tertiary text-c-tertiary
+        enabled:hover:[background-color:color-mix(in_oklab,var(--color-c-tertiary)_8%,transparent)]
+        enabled:focus-visible:[background-color:color-mix(in_oklab,var(--color-c-tertiary)_12%,transparent)];
+}
+@utility btn-outlined-error {
+    @apply btn-outlined border-c-error text-c-error
+        enabled:hover:[background-color:color-mix(in_oklab,var(--color-c-error)_8%,transparent)]
+        enabled:focus-visible:[background-color:color-mix(in_oklab,var(--color-c-error)_12%,transparent)];
+}
+@utility btn-outlined-success {
+    @apply btn-outlined border-c-success text-c-success
+        enabled:hover:[background-color:color-mix(in_oklab,var(--color-c-success)_8%,transparent)]
+        enabled:focus-visible:[background-color:color-mix(in_oklab,var(--color-c-success)_12%,transparent)];
 }
