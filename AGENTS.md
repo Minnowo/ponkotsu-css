@@ -72,8 +72,8 @@ For chart series and user-assignable tag colors, where you need several
 mutually distinct colors rather than one semantic role: `pink`, `red`,
 `yellow`, `green`, `blue` (same `--color-c-*` / `c-*` convention as
 everything else). Each one comes as a pair of variants - `<name>` (vivid/
-dark) and `<name>-pale` (pale/light) - each with its own `on-<name>` /
-`on-<name>-pale` text pair. Same pairing rule as `primary`/`on-primary`.
+dark) and `l-<name>` (pale/light) - each with its own `on-<name>` /
+`on-l-<name>` text pair. Same pairing rule as `primary`/`on-primary`.
 
 don't assume `red` means "error" just because it's red.
 There is `error` and `on-error` for that.
@@ -114,6 +114,16 @@ carries the meaning within each:
   `outline`, text `on-surface`) - MD3's own base "Outlined Button" isn't
   tied to a color either; the color suffixes are this system's extension,
   same pattern as the filled variants.
+
+`btn-*`'s hover/focus colors are pre-generated roles, not a runtime
+`color-mix()` - `<role>-hover` / `<role>-focus` (opaque, for filled
+buttons) and `<role>-hover-tint` / `<role>-focus-tint` (translucent, for
+outlined buttons/anything over a non-solid background) exist for
+`primary`/`secondary`/`tertiary`/`error`/`success`, plus
+`surface-container-low-hover`/`-focus` and `on-surface-hover-tint`/
+`-focus-tint` for the neutral (colorless) button. Reuse these directly on
+a custom component instead of writing a new `color-mix()` - that's why
+they're generated up front rather than left inline in `base.css`.
 
 **Shape is 2 sizes**: `rounded-sm` (4px - inputs, small controls) and
 `rounded-md` (8px - `surface-*` containers).

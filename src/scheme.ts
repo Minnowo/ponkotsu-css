@@ -66,6 +66,77 @@ export function hexFromArgb(argb: number): string {
   return `#${toHex(r)}${toHex(g)}${toHex(b)}`;
 }
 
+// sRGB <-> OKLab (Bjorn Ottosson's formulas: https://bottosson.github.io/posts/oklab/),
+// used by mixOklab below to replicate CSS's `color-mix(in oklab, ...)` at
+// generation time instead of at paint time - see base.css's *-hover/-focus
+// variables for why.
+function srgbToLinear(c: number): number {
+  const v = c / 255;
+  return v <= 0.04045 ? v / 12.92 : Math.pow((v + 0.055) / 1.055, 2.4);
+}
+
+function linearToSrgb(v: number): number {
+  const c = v <= 0.0031308 ? 12.92 * v : 1.055 * Math.pow(v, 1 / 2.4) - 0.055;
+  return Math.round(Math.max(0, Math.min(1, c)) * 255);
+}
+
+interface Oklab {
+  l: number;
+  a: number;
+  b: number;
+}
+
+function oklabFromArgb(argb: number): Oklab {
+  const r = srgbToLinear((argb >> 16) & 255);
+  const g = srgbToLinear((argb >> 8) & 255);
+  const b = srgbToLinear(argb & 255);
+  const l = Math.cbrt(0.4122214708 * r + 0.5363325363 * g + 0.0514459929 * b);
+  const m = Math.cbrt(0.2119034982 * r + 0.6806995451 * g + 0.1073969566 * b);
+  const s = Math.cbrt(0.0883024619 * r + 0.2817188376 * g + 0.6299787005 * b);
+  return {
+    l: 0.2104542553 * l + 0.7936177850 * m - 0.0040720468 * s,
+    a: 1.9779984951 * l - 2.4285922050 * m + 0.4505937099 * s,
+    b: 0.0259040371 * l + 0.7827717662 * m - 0.8086757660 * s,
+  };
+}
+
+function argbFromOklab(color: Oklab): number {
+  const l_ = color.l + 0.3963377774 * color.a + 0.2158037573 * color.b;
+  const m_ = color.l - 0.1055613458 * color.a - 0.0638541728 * color.b;
+  const s_ = color.l - 0.0894841775 * color.a - 1.2914855480 * color.b;
+  const l = l_ * l_ * l_;
+  const m = m_ * m_ * m_;
+  const s = s_ * s_ * s_;
+  const r = linearToSrgb(+4.0767416621 * l - 3.3077115913 * m + 0.2309699292 * s);
+  const g = linearToSrgb(-1.2684380046 * l + 2.6097574011 * m - 0.3413193965 * s);
+  const b = linearToSrgb(-0.0041960863 * l - 0.7034186147 * m + 1.7076147010 * s);
+  return (255 << 24 | (r & 255) << 16 | (g & 255) << 8 | b & 255) >>> 0;
+}
+
+/** Matches CSS's `color-mix(in oklab, hexA percent%, hexB)` - percent% of hexA blended into hexB. */
+function mixOklab(hexA: string, percent: number, hexB: string): string {
+  const a = oklabFromArgb(argbFromHex(hexA));
+  const b = oklabFromArgb(argbFromHex(hexB));
+  const t = percent / 100;
+  return hexFromArgb(argbFromOklab({
+    l: b.l + (a.l - b.l) * t,
+    a: b.a + (a.a - b.a) * t,
+    b: b.b + (a.b - b.b) * t,
+  }));
+}
+
+/**
+ * Matches CSS's `color-mix(in oklab, hex percent%, transparent)` - hex's own
+ * color kept as-is, with alpha set to percent% (mixing any opaque color into
+ * fully transparent leaves its hue/lightness untouched and just scales
+ * alpha). Returned as an 8-digit hex so it composites correctly over
+ * whatever background it's placed on, unlike a precomputed opaque blend.
+ */
+function alphaTint(hex: string, percent: number): string {
+  const alpha = Math.round((percent / 100) * 255);
+  return `${hex}${alpha.toString(16).padStart(2, '0')}`;
+}
+
 // Categorical palette for charts and tag colors - needs to stay mutually
 // distinct regardless of the seed colors, so these are fixed reference
 // hues, each harmonized toward primary (MD3's Blend.harmonize). Names
@@ -116,7 +187,8 @@ function harmonizedPalette(hex: string, primaryArgb: number): TonalPalette {
 export type Roles = Record<string, string>;
 
 // Each categorical color gets 2 tones instead of 1 flat one - a vivid/dark
-// variant (<name>) and a pale/light variant (<name>-pale) - since a single
+// variant (<name>) and a pale/light variant (l-<name>, "l" for "light") -
+// since a single
 // shared tone wasn't enough to keep every color visually distinct even
 // after widening hue gaps (see CATEGORICAL_SEEDS above). Same tones for
 // both themes, like the single-tone version before it: a light, muted
@@ -132,6 +204,33 @@ const WHEEL_TONE = 62;
 const WHEEL_ON_TONE = 20;
 const WHEEL_PALE_TONE = 80;
 const WHEEL_PALE_ON_TONE = 20;
+
+// MD3's "state layer": hover/focus on a filled button tints the fill with
+// a translucent wash of the button's own on-* color (8% hover, 12%
+// focus). Generated here (via mixOklab) rather than left as a
+// `color-mix()` in base.css so any element - not just the built-in
+// btn-* utilities - can reuse the exact same hover/focus color a button
+// uses, and so the 8%/12% constants live in one place. [fillRole, onRole]
+// pairs to generate <fillRole>-hover/-focus for.
+const STATE_LAYER_FILL_PAIRS: Array<[string, string]> = [
+  ['primary', 'on-primary'],
+  ['secondary', 'on-secondary'],
+  ['tertiary', 'on-tertiary'],
+  ['error', 'on-error'],
+  ['success', 'on-success'],
+  // The base (colorless) button and neutral outlined button don't have
+  // their own on-* role - they tint with on-surface instead.
+  ['surface-container-low', 'on-surface'],
+];
+
+// Same idea, for outlined buttons: the tint is the role's own color at
+// 8%/12% alpha over transparent (not blended into a fill), generating
+// <role>-hover-tint/-focus-tint. alphaTint keeps an actual alpha channel
+// rather than baking in one specific background, so it still composites
+// correctly however it's placed.
+const STATE_LAYER_TINT_ROLES = ['primary', 'secondary', 'tertiary', 'error', 'success', 'on-surface'];
+const STATE_LAYER_HOVER_PERCENT = 8;
+const STATE_LAYER_FOCUS_PERCENT = 12;
 
 export function corePaletteFromSeeds(seeds: Seeds): CorePalette {
   return CorePalette.contentFromColors({
@@ -289,8 +388,20 @@ export function buildScheme(
     const palette = TonalPalette.fromHueAndChroma(harmonized.hue, harmonized.chroma * MUTED_CHROMA_FACTOR);
     roles[name] = hexFromArgb(palette.tone(clampTone(WHEEL_TONE + wheelShiftTone)));
     roles[`on-${name}`] = hexFromArgb(palette.tone(clampTone(WHEEL_ON_TONE + wheelShiftTone)));
-    roles[`${name}-pale`] = hexFromArgb(palette.tone(clampTone(WHEEL_PALE_TONE + wheelShiftTone)));
-    roles[`on-${name}-pale`] = hexFromArgb(palette.tone(clampTone(WHEEL_PALE_ON_TONE + wheelShiftTone)));
+    roles[`l-${name}`] = hexFromArgb(palette.tone(clampTone(WHEEL_PALE_TONE + wheelShiftTone)));
+    roles[`on-l-${name}`] = hexFromArgb(palette.tone(clampTone(WHEEL_PALE_ON_TONE + wheelShiftTone)));
+  }
+
+  // Precomputed hover/focus state-layer colors - see STATE_LAYER_FILL_PAIRS
+  // above for why these are generated here instead of left as a
+  // `color-mix()` in base.css.
+  for (const [fillRole, onRole] of STATE_LAYER_FILL_PAIRS) {
+    roles[`${fillRole}-hover`] = mixOklab(roles[onRole], STATE_LAYER_HOVER_PERCENT, roles[fillRole]);
+    roles[`${fillRole}-focus`] = mixOklab(roles[onRole], STATE_LAYER_FOCUS_PERCENT, roles[fillRole]);
+  }
+  for (const role of STATE_LAYER_TINT_ROLES) {
+    roles[`${role}-hover-tint`] = alphaTint(roles[role], STATE_LAYER_HOVER_PERCENT);
+    roles[`${role}-focus-tint`] = alphaTint(roles[role], STATE_LAYER_FOCUS_PERCENT);
   }
 
   return roles;

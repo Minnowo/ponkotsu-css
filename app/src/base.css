@@ -95,10 +95,13 @@
     }
 
     button {
+        user-select: none;
+        -webkit-touch-callout: none;
         @apply enabled:hover:cursor-pointer
             enabled:hover:border-c-outline enabled:focus:border-c-outline enabled:focus-within:border-c-outline
-            enabled:hover:[background-color:color-mix(in_oklab,var(--color-c-on-surface)_8%,var(--color-c-surface-container-low))]
-            enabled:focus-visible:[background-color:color-mix(in_oklab,var(--color-c-on-surface)_12%,var(--color-c-surface-container-low))];
+            enabled:hover:bg-c-surface-container-low-hover
+            enabled:focus-visible:bg-c-surface-container-low-focus
+            enabled:active:bg-c-surface-container-low-focus;
     }
 
     input[type="checkbox"], input[type="radio"], input[type="range"] {
@@ -192,59 +195,57 @@
 }
 @utility btn-primary {
     @apply btn-filled bg-c-primary text-c-on-primary
-        enabled:hover:[background-color:color-mix(in_oklab,var(--color-c-on-primary)_8%,var(--color-c-primary))]
-        enabled:focus-visible:[background-color:color-mix(in_oklab,var(--color-c-on-primary)_12%,var(--color-c-primary))];
+        enabled:hover:bg-c-primary-hover enabled:focus-visible:bg-c-primary-focus enabled:active:bg-c-primary-focus;
 }
 @utility btn-secondary {
     @apply btn-filled bg-c-secondary text-c-on-secondary
-        enabled:hover:[background-color:color-mix(in_oklab,var(--color-c-on-secondary)_8%,var(--color-c-secondary))]
-        enabled:focus-visible:[background-color:color-mix(in_oklab,var(--color-c-on-secondary)_12%,var(--color-c-secondary))];
+        enabled:hover:bg-c-secondary-hover enabled:focus-visible:bg-c-secondary-focus
+        enabled:active:bg-c-secondary-focus;
 }
 @utility btn-tertiary {
     @apply btn-filled bg-c-tertiary text-c-on-tertiary
-        enabled:hover:[background-color:color-mix(in_oklab,var(--color-c-on-tertiary)_8%,var(--color-c-tertiary))]
-        enabled:focus-visible:[background-color:color-mix(in_oklab,var(--color-c-on-tertiary)_12%,var(--color-c-tertiary))];
+        enabled:hover:bg-c-tertiary-hover enabled:focus-visible:bg-c-tertiary-focus
+        enabled:active:bg-c-tertiary-focus;
 }
 @utility btn-error {
     @apply btn-filled bg-c-error text-c-on-error
-        enabled:hover:[background-color:color-mix(in_oklab,var(--color-c-on-error)_8%,var(--color-c-error))]
-        enabled:focus-visible:[background-color:color-mix(in_oklab,var(--color-c-on-error)_12%,var(--color-c-error))];
+        enabled:hover:bg-c-error-hover enabled:focus-visible:bg-c-error-focus enabled:active:bg-c-error-focus;
 }
 @utility btn-success {
     @apply btn-filled bg-c-success text-c-on-success
-        enabled:hover:[background-color:color-mix(in_oklab,var(--color-c-on-success)_8%,var(--color-c-success))]
-        enabled:focus-visible:[background-color:color-mix(in_oklab,var(--color-c-on-success)_12%,var(--color-c-success))];
+        enabled:hover:bg-c-success-hover enabled:focus-visible:bg-c-success-focus
+        enabled:active:bg-c-success-focus;
 }
 
 @utility btn-outlined {
     @apply px-3 py-1 rounded font-medium bg-transparent border enabled:hover:cursor-pointer
         border-c-outline text-c-on-surface
-        enabled:hover:[background-color:color-mix(in_oklab,var(--color-c-on-surface)_8%,transparent)]
-        enabled:focus-visible:[background-color:color-mix(in_oklab,var(--color-c-on-surface)_12%,transparent)]
+        enabled:hover:bg-c-on-surface-hover-tint enabled:focus-visible:bg-c-on-surface-focus-tint
+        enabled:active:bg-c-on-surface-focus-tint
         disabled:opacity-38 disabled:cursor-not-allowed;
 }
 @utility btn-outlined-primary {
     @apply btn-outlined border-c-primary text-c-primary
-        enabled:hover:[background-color:color-mix(in_oklab,var(--color-c-primary)_8%,transparent)]
-        enabled:focus-visible:[background-color:color-mix(in_oklab,var(--color-c-primary)_12%,transparent)];
+        enabled:hover:bg-c-primary-hover-tint enabled:focus-visible:bg-c-primary-focus-tint
+        enabled:active:bg-c-primary-focus-tint;
 }
 @utility btn-outlined-secondary {
     @apply btn-outlined border-c-secondary text-c-secondary
-        enabled:hover:[background-color:color-mix(in_oklab,var(--color-c-secondary)_8%,transparent)]
-        enabled:focus-visible:[background-color:color-mix(in_oklab,var(--color-c-secondary)_12%,transparent)];
+        enabled:hover:bg-c-secondary-hover-tint enabled:focus-visible:bg-c-secondary-focus-tint
+        enabled:active:bg-c-secondary-focus-tint;
 }
 @utility btn-outlined-tertiary {
     @apply btn-outlined border-c-tertiary text-c-tertiary
-        enabled:hover:[background-color:color-mix(in_oklab,var(--color-c-tertiary)_8%,transparent)]
-        enabled:focus-visible:[background-color:color-mix(in_oklab,var(--color-c-tertiary)_12%,transparent)];
+        enabled:hover:bg-c-tertiary-hover-tint enabled:focus-visible:bg-c-tertiary-focus-tint
+        enabled:active:bg-c-tertiary-focus-tint;
 }
 @utility btn-outlined-error {
     @apply btn-outlined border-c-error text-c-error
-        enabled:hover:[background-color:color-mix(in_oklab,var(--color-c-error)_8%,transparent)]
-        enabled:focus-visible:[background-color:color-mix(in_oklab,var(--color-c-error)_12%,transparent)];
+        enabled:hover:bg-c-error-hover-tint enabled:focus-visible:bg-c-error-focus-tint
+        enabled:active:bg-c-error-focus-tint;
 }
 @utility btn-outlined-success {
     @apply btn-outlined border-c-success text-c-success
-        enabled:hover:[background-color:color-mix(in_oklab,var(--color-c-success)_8%,transparent)]
-        enabled:focus-visible:[background-color:color-mix(in_oklab,var(--color-c-success)_12%,transparent)];
+        enabled:hover:bg-c-success-hover-tint enabled:focus-visible:bg-c-success-focus-tint
+        enabled:active:bg-c-success-focus-tint;
 }

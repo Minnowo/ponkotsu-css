@@ -46,65 +46,135 @@ you mostly just pick a color/surface class and lay things out.
 
 See the [AGENTS.md](./AGENTS.md) which is a skill for agents.
 
-### Colors
-
-Every color is `c-<role>`, used like any Tailwind color: `bg-c-primary`,
-`text-c-on-primary`, `border-c-outline`.
-
-| Class | Use it for |
-|---|---|
-| `primary` / `on-primary` | your main buttons, links, the active nav item |
-| `secondary` / `on-secondary` | less important actions than primary |
-| `tertiary` / `on-tertiary` | an accent, used sparingly (badges, highlights) |
-| `*-container` / `on-*-container` | a softer fill version of any of the above (e.g. `primary-container`) |
-| `surface`, `on-surface`, `on-surface-variant` | page background and its text |
-| `outline`, `outline-variant` | borders and dividers |
-| `error` / `on-error` | destructive stuff (delete) |
-| `success` / `on-success` | confirming stuff (save, done) |
-| `pink`, `red`, `yellow`, `green`, `blue` (each also has an `on-<name>` and a paler `<name>-pale` / `on-<name>-pale`) | a set of regular colors |
-
-**The one rule**: only put `on-X` text on an `X` background. `on-primary`
-text goes on `primary`, never on `surface` or anything else. Mixing them
-is how you end up with unreadable text.
-
 ### Base style
 
-Plain HTML elements are already styled just tweak them as needed.
+All the inputs are styled by default,
+and base style adds some extra classes for ease of use.
 
-**Boxes**: Use `surface-1`, and bump the number each
-time you nest one box inside another:
+#### Boxes 
 
+The `surface-<n>` class (n is 1-4 inclusive) is meant for nested containers.
+The higher `n` the more the surface color changes for contrast.
+
+Just bump the number each time you nest one box inside another:
 ```html
 <div class="surface-1">
   outer box
   <div class="surface-2">
     a box inside that box
+    <div class="surface-3">
+      the second last box
+      <div class="surface-4">
+         there is no box deeper
+      </div>
+    </div>
   </div>
 </div>
 ```
 
-`surface-3` and `surface-4` exist for deeper nesting. Each step is a
-slightly different shade, so nested boxes stay visually distinct without
-you thinking about which color to use.
+If you just need a border without nested shading use `surface-outlined`:
+```html
+<div class="surface-outlined">
+   Some content in a box
+</div>
+```
 
-**Buttons**: pick the one that matches what the button does. Filled for the
-main action, outlined for a lower-emphasis one next to it.
+#### Buttons
 
-| Class | Use it for |
-|---|---|
-| `btn-primary` | the main action |
-| `btn-secondary` | a secondary action |
-| `btn-tertiary` | a contrasting accent action |
-| `btn-error` | delete / destructive |
-| `btn-success` | save / confirm |
-| `btn-outlined` | neutral, lower-emphasis (border + text, no fill) |
-| `btn-outlined-primary` / `-secondary` / `-tertiary` / `-error` / `-success` | same, colored |
+Just using `<button>` without any class will be themed already.
 
-That's basically the whole system: pick a `surface-N` for boxes, pick a
-`btn-*` for buttons, use `c-*` colors when you need something more
-specific, and let everything else (text, forms, tables) style itself.
+For solid colored buttons use classes:
+```html
+<button class="btn-primary"> Primary </button>
+<button class="btn-secondary"> Secondary </button>
+<button class="btn-tertiary"> Tertiary </button>
+<button class="btn-success"> Done </button>
+<button class="btn-error"> Delete </button>
+```
 
-Then just use Tailwind for layout as normal.
+For wire-frame buttons use classes:
+```html
+<button class="btn-outlined"> Regular </button>
+<button class="btn-outlined-primary"> Primary </button>
+<button class="btn-outlined-secondary"> Secondary </button>
+<button class="btn-outlined-tertiary"> Tertiary </button>
+<button class="btn-outlined-success"> Done </button>
+<button class="btn-outlined-error"> Delete </button>
+```
+
+The button utilities already handle hover, focus, active, and disabled
+states.
+
+### Colors
+
+All colors use Tailwind's theme variable format, with a `c-` prefix.
+This makes auto complete easier for colors.
+
+For example:
+```html
+<button class="bg-c-primary text-c-on-primary">Save</button>
+```
+
+All the defined colors are in the table below, (remember you need to include `c-` when using them from Tailwind utilities)
+
+| Foreground | Background | Description |
+|---|---|---|
+| `on-primary` | `primary` | Main brand/action color |
+| - | `primary-hover` | Hover color of `primary` |
+| - | `primary-focus` | Focus color of `primary` |
+| - | `primary-hover-tint` | Translucent version of `primary`, for hover over a transparent/non-solid background |
+| - | `primary-focus-tint` | Translucent version of `primary`, for focus over a transparent/non-solid background |
+| `on-primary-container` | `primary-container` | Container using primary color |
+| `on-secondary` | `secondary` | Secondary emphasis/action color |
+| - | `secondary-hover` | Hover color of `secondary` |
+| - | `secondary-focus` | Focus color of `secondary` |
+| - | `secondary-hover-tint` | Translucent version of `secondary`, for hover over a transparent/non-solid background |
+| - | `secondary-focus-tint` | Translucent version of `secondary`, for focus over a transparent/non-solid background |
+| `on-secondary-container` | `secondary-container` | Container using secondary color |
+| `on-tertiary` | `tertiary` | Additional accent color |
+| - | `tertiary-hover` | Hover color of `tertiary` |
+| - | `tertiary-focus` | Focus color of `tertiary` |
+| - | `tertiary-hover-tint` | Translucent version of `tertiary`, for hover over a transparent/non-solid background |
+| - | `tertiary-focus-tint` | Translucent version of `tertiary`, for focus over a transparent/non-solid background |
+| `on-tertiary-container` | `tertiary-container` | Container using tertiary color |
+| `on-error` | `error` | Error or destructive state |
+| - | `error-hover` | Hover color of `error` |
+| - | `error-focus` | Focus color of `error` |
+| - | `error-hover-tint` | Translucent version of `error`, for hover over a transparent/non-solid background |
+| - | `error-focus-tint` | Translucent version of `error`, for focus over a transparent/non-solid background |
+| `on-success` | `success` | Success or confirmation state |
+| - | `success-hover` | Hover color of `success` |
+| - | `success-focus` | Focus color of `success` |
+| - | `success-hover-tint` | Translucent version of `success`, for hover over a transparent/non-solid background |
+| - | `success-focus-tint` | Translucent version of `success`, for focus over a transparent/non-solid background |
+| `on-surface` | `surface` | Page background and primary content |
+| `on-surface-variant` | `surface` | Lower-emphasis text on the page background (e.g. a caption or hint) |
+| - | `on-surface-hover-tint` | Translucent version of `on-surface`, for hover over a transparent/non-solid background - what the neutral `btn-outlined` uses |
+| - | `on-surface-focus-tint` | Translucent version of `on-surface`, for focus over a transparent/non-solid background - what the neutral `btn-outlined` uses |
+| `on-surface` | `surface-container-lowest` | Lowest surface container |
+| `on-surface` | `surface-container-low` | Low surface container |
+| - | `surface-container-low-hover` | Hover color of `surface-container-low`, used by the neutral (colorless) `<button>` |
+| - | `surface-container-low-focus` | Focus color of `surface-container-low`, used by the neutral (colorless) `<button>` |
+| `on-surface` | `surface-container` | Default surface container |
+| `on-surface` | `surface-container-high` | High surface container |
+| `on-surface` | `surface-container-highest` | Highest surface container |
+| `on-surface` | `surface-dim` | Dimmed surface |
+| `on-surface` | `surface-bright` | Bright surface |
+| `inverse-on-surface` | `inverse-surface` | Inverted surface for things like toasts and tooltips |
+| `inverse-primary` | - | Accent for a link/action on top of `inverse-surface` |
+| `on-pink` | `pink` | Pink color |
+| `on-l-pink` | `l-pink` | Lighter pink color |
+| `on-red` | `red` | Red color |
+| `on-l-red` | `l-red` | Lighter red color |
+| `on-yellow` | `yellow` | Yellow color |
+| `on-l-yellow` | `l-yellow` | Lighter yellow color |
+| `on-green` | `green` | Green color |
+| `on-l-green` | `l-green` | Lighter green color |
+| `on-blue` | `blue` | Blue color |
+| `on-l-blue` | `l-blue` | Lighter blue color |
+| - | `outline` | Borders and dividers |
+| - | `outline-variant` | Subtle borders and dividers |
+
 
 ## Try it live
 

@@ -2,28 +2,33 @@
 @import './base.css';
 
 /* Fallback values only - App.tsx always overrides these per preview panel
-   via inline style, so the exact numbers here don't matter. */
+   via inline style, so the exact numbers here don't matter. What DOES
+   matter is that every role name buildScheme can produce is listed here -
+   Tailwind only generates a bg-c-<role>/text-c-<role>/etc. utility for a
+   role it's seen declared as a --color-c-<role> custom property somewhere
+   in the source CSS it's scanning, so a role missing from this block
+   means the derived class base.css applies (e.g. bg-c-primary-hover)
+   silently does nothing here even though the same class works fine in
+   real generated output (which always includes every role). Regenerate
+   with `node build/src/scheme.js`-style output (see chat history) if
+   scheme.ts adds another role and hover states stop visibly changing. */
 @theme {
     --color-c-primary: #e1c385;
     --color-c-on-primary: #3f2e00;
-    --color-c-primary-container: #584412;
+    --color-c-primary-container: #52452a;
     --color-c-on-primary-container: #fedf9f;
     --color-c-secondary: #92ccff;
     --color-c-on-secondary: #003351;
-    --color-c-secondary-container: #004b73;
+    --color-c-secondary-container: #254a66;
     --color-c-on-secondary-container: #cce5ff;
     --color-c-tertiary: #e1b6ff;
     --color-c-on-tertiary: #4c007b;
-    --color-c-tertiary-container: #691a9f;
+    --color-c-tertiary-container: #5a3874;
     --color-c-on-tertiary-container: #f2daff;
-    --color-c-error: #ffb4ab;
-    --color-c-on-error: #690005;
-    --color-c-error-container: #93000a;
-    --color-c-on-error-container: #ffdad6;
-    --color-c-success: #91d888;
-    --color-c-on-success: #003908;
-    --color-c-success-container: #0b5314;
-    --color-c-on-success-container: #acf4a2;
+    --color-c-error: #ffb690;
+    --color-c-on-error: #522305;
+    --color-c-success: #a9d1a0;
+    --color-c-on-success: #153714;
     --color-c-surface: #151310;
     --color-c-on-surface: #e7e1dc;
     --color-c-on-surface-variant: #cdc5bc;
@@ -39,4 +44,48 @@
     --color-c-inverse-surface: #e7e1dc;
     --color-c-inverse-on-surface: #32302d;
     --color-c-inverse-primary: #725b28;
+    --color-c-pink: #a7909b;
+    --color-c-on-pink: #3c2b34;
+    --color-c-l-pink: #dac0cb;
+    --color-c-on-l-pink: #3c2b34;
+    --color-c-red: #b38e7c;
+    --color-c-on-red: #442a1d;
+    --color-c-l-red: #e7beaa;
+    --color-c-on-l-red: #442a1d;
+    --color-c-yellow: #a09575;
+    --color-c-on-yellow: #373017;
+    --color-c-l-yellow: #d2c6a3;
+    --color-c-on-l-yellow: #373017;
+    --color-c-green: #8a9a85;
+    --color-c-on-green: #263423;
+    --color-c-l-green: #bbcbb4;
+    --color-c-on-l-green: #263423;
+    --color-c-blue: #799ab0;
+    --color-c-on-blue: #0e3446;
+    --color-c-l-blue: #a9cbe2;
+    --color-c-on-l-blue: #0e3446;
+    --color-c-primary-hover: #d3b67a;
+    --color-c-primary-focus: #ccaf74;
+    --color-c-secondary-hover: #86bff0;
+    --color-c-secondary-focus: #80b8e8;
+    --color-c-tertiary-hover: #d4a8f4;
+    --color-c-tertiary-focus: #cea2ef;
+    --color-c-error-hover: #f0a984;
+    --color-c-error-focus: #e9a37e;
+    --color-c-success-hover: #9cc494;
+    --color-c-success-focus: #96bd8e;
+    --color-c-surface-container-low-hover: #2a2825;
+    --color-c-surface-container-low-focus: #312f2c;
+    --color-c-primary-hover-tint: #e1c38514;
+    --color-c-primary-focus-tint: #e1c3851f;
+    --color-c-secondary-hover-tint: #92ccff14;
+    --color-c-secondary-focus-tint: #92ccff1f;
+    --color-c-tertiary-hover-tint: #e1b6ff14;
+    --color-c-tertiary-focus-tint: #e1b6ff1f;
+    --color-c-error-hover-tint: #ffb69014;
+    --color-c-error-focus-tint: #ffb6901f;
+    --color-c-success-hover-tint: #a9d1a014;
+    --color-c-success-focus-tint: #a9d1a01f;
+    --color-c-on-surface-hover-tint: #e7e1dc14;
+    --color-c-on-surface-focus-tint: #e7e1dc1f;
 }

@@ -62,10 +62,10 @@ const CATEGORICAL_BASE_NAMES = [
 
 // Each base name has a vivid/dark variant and a pale/light variant (see
 // WHEEL_TONE in scheme.ts) - grouped dark-half/light-half here rather than
-// interleaved, which read better than alternating dark/pale/dark/pale.
+// interleaved, which read better than alternating dark/light/dark/light.
 const CATEGORICAL_NAMES = [
   ...CATEGORICAL_BASE_NAMES,
-  ...CATEGORICAL_BASE_NAMES.map((name) => `${name}-pale`),
+  ...CATEGORICAL_BASE_NAMES.map((name) => `l-${name}`),
 ];
 
 // Quick visual gut-check for how a set of categorical colors read together
