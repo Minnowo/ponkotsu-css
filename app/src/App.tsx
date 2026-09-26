@@ -38,13 +38,25 @@ function ColorField({label, value, onChange}: {label: string; value: string; onC
 // as that theme goes, +1 = as light as that theme goes, 0 = unshifted.
 // Affects both the Light and Dark panels below, each shifted from its own
 // baseline.
-function RangeField({label, value, onChange}: {label: string; value: number; onChange: (value: number) => void}) {
+function RangeField({
+  label,
+  value,
+  onChange,
+  min = -1,
+  max = 1,
+}: {
+  label: string;
+  value: number;
+  onChange: (value: number) => void;
+  min?: number;
+  max?: number;
+}) {
   return (
     <label class="flex items-center gap-2 text-sm">
       <input
         type="range"
-        min={-1}
-        max={1}
+        min={min}
+        max={max}
         step={0.01}
         value={value}
         onInput={(e) => onChange(Number((e.target as HTMLInputElement).value))}
@@ -116,9 +128,7 @@ function ThemePreview({title, roles, showWheel}: {title: string; roles: Roles; s
         <section class="flex flex-col gap-2">
           <h3>Categorical (charts / tags)</h3>
           <p class="text-c-on-surface-variant text-xs mb-0">
-            Fixed hues, harmonized toward primary - distinct from each other, related to the theme. Each color has
-            a vivid/dark and a pale/light variant (dark half of the wheel, then the light half). error/success
-            alias red/green from this set (see below).
+            Fixed hues, harmonized toward primary, related to the theme.
           </p>
           <CategoricalSwatches names={CATEGORICAL_NAMES} />
           <CategoricalPieChart names={CATEGORICAL_NAMES} />
@@ -156,6 +166,34 @@ function ThemePreview({title, roles, showWheel}: {title: string; roles: Roles; s
       </section>
 
       <section class="flex flex-col gap-2">
+        <div class="flex flex-wrap gap-4">
+          <div class="surface-2 flex flex-col gap-2 max-w-64">
+            <h4 class="mb-0">Accept invitation?</h4>
+            <p class="text-sm mb-0">This item will be added to your calendar.</p>
+            <div class="flex justify-end gap-2 mt-auto">
+              <button >Cancel</button>
+              <button class="btn-primary">Confirm</button>
+            </div>
+          </div>
+          <div class="surface-2 flex flex-col gap-2 max-w-64">
+            <h4 class="mb-0">Quit without saving?</h4>
+            <p class="text-sm mb-0">Your unsaved progress will be lost.</p>
+            <div class="flex justify-end gap-2 mt-auto">
+              <button class="btn-outlined">Cancel</button>
+              <button class="btn-error">Quit</button>
+            </div>
+          </div>
+          <div class="surface-2 flex flex-col gap-2 max-w-64">
+            <h4 class="mb-0">Goal saved</h4>
+            <p class="text-sm mb-0">Your changes have been saved.</p>
+            <div class="flex justify-end gap-2 mt-auto">
+              <button class="btn-success">Done</button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="flex flex-col gap-2">
         <h3>Outlined buttons</h3>
         <div class="flex flex-wrap gap-2">
           <button class="btn-outlined">Neutral</button>
@@ -189,24 +227,41 @@ function ThemePreview({title, roles, showWheel}: {title: string; roles: Roles; s
 
       <section class="flex flex-col gap-2">
         <h3>Containers</h3>
-        <div class="flex flex-wrap gap-2">
-          <span class="rounded-sm px-2 py-1 bg-c-primary-container text-c-on-primary-container">
-            Primary container
-          </span>
-          <span class="rounded-sm px-2 py-1 bg-c-secondary-container text-c-on-secondary-container">
-            Secondary container
-          </span>
-          <span class="rounded-sm px-2 py-1 bg-c-tertiary-container text-c-on-tertiary-container">
-            Tertiary container
-          </span>
+
+        <p class="text-c-on-surface-variant text-xs mb-0">
+          *-container: a callout that needs to pop out of the page - not a button, just a softer-than-solid fill
+          for a note the user should notice.
+        </p>
+        <div class="flex flex-col gap-2">
+          <div class="rounded-md p-3 bg-c-primary-container text-c-on-primary-container">
+            <strong>Tip:</strong> this is a primary-container.
+          </div>
+          <div class="rounded-md p-3 bg-c-secondary-container text-c-on-secondary-container">
+            <strong>Note:</strong> goals reset at midnight in your local timezone.
+          </div>
+          <div class="rounded-md p-3 bg-c-tertiary-container text-c-on-tertiary-container">
+            <strong>New:</strong> you can now export your data as CSV from the export page.
+          </div>
         </div>
 
-        {/* Nesting ladder: each level up steps the surface-container tone,
-            so 3 boxes deep still reads as 3 distinct layers. */}
-        <div class="surface-2">
-          <p>surface-2, nested inside this panel's surface-1</p>
-          <div class="surface-3">
-            <p class="mb-0">surface-3, nested inside the surface-2 above</p>
+        <p class="text-c-on-surface-variant text-xs mb-0">
+          surface-1..4: nesting depth in a real settings panel, not just a color pick.
+        </p>
+        <div class="surface-2 flex flex-col gap-3">
+          <h4 class="mb-0">Notifications</h4>
+          <div class="surface-3 flex flex-col gap-3">
+            <div class="flex items-center justify-between gap-4">
+              <span>Daily reminder</span>
+              <input type="checkbox" defaultChecked />
+            </div>
+            <div class="surface-4 flex items-center justify-between gap-4">
+              <span>...at a custom time</span>
+              <input type="time" defaultValue="09:00" />
+            </div>
+          </div>
+          <div class="surface-outlined flex flex-col gap-2">
+            <span class="font-medium text-c-error">Danger zone</span>
+            <button class="btn-outlined-error self-start">Delete all reminders</button>
           </div>
         </div>
       </section>
@@ -316,6 +371,7 @@ export function App() {
     secondary: '#5AA9E6',
     tertiary: '#C77DFF',
     shift: 0,
+    dimBaseline: 0.4,
   });
 
   const {light, dark} = useMemo(() => {
@@ -374,6 +430,13 @@ export function App() {
             label="Shift"
             value={seeds.shift ?? 0}
             onChange={(value) => setSeeds({...seeds, shift: value})}
+          />
+          <RangeField
+            label="Dim baseline"
+            min={0}
+            max={1}
+            value={seeds.dimBaseline ?? 0.4}
+            onChange={(value) => setSeeds({...seeds, dimBaseline: value})}
           />
           <button
             class="btn-secondary"

@@ -24,10 +24,6 @@
     h3 { @apply text-xl mb-2; }
     h4, h5, h6 { @apply text-lg mb-2; }
 
-    p {
-        @apply mb-3;
-    }
-
     small {
         color: var(--color-c-on-surface-variant);
     }
@@ -184,9 +180,7 @@
 /* For a box that should sit flush with the page (no tone step) but still
    needs a drawn boundary. Prefer surface-1..4 for anything stacked. */
 @utility surface-outlined {
-    background: var(--color-c-surface);
-    border: 1px solid var(--color-c-outline-variant);
-    @apply text-c-on-surface rounded-md p-3;
+    @apply text-c-on-surface border border-c-outline-variant rounded-md p-3;
 }
 
 @utility btn-filled {

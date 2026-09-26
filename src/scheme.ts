@@ -37,6 +37,11 @@ export interface Seeds {
   // generate exactly the same output as before. Range roughly -1..1;
   // MAX_SHIFT_TONE below is the actual tone-point range that maps to.
   shift?: number;
+  // Chroma factor for primary/secondary/tertiary/error/success at shift 0
+  // (see DIM_CHROMA_BASELINE below) - exposed here so it's tunable without
+  // editing the constant directly. Optional/defaults to
+  // DIM_CHROMA_BASELINE.
+  dimBaseline?: number;
 }
 
 // The `shift` range (-1..1) is normalized so it means the same thing
@@ -240,28 +245,12 @@ export function corePaletteFromSeeds(seeds: Seeds): CorePalette {
   });
 }
 
-// HCT's max achievable chroma varies a lot by tone - it's naturally low
-// near the white/black edges (tone 90+/10-), which is why light's
-// *-container (tone 90) and dark's on-*-container (tone 90) already read
-// as muted without any help. But tone 40 (light's primary/secondary/
-// tertiary) and tone 30 (dark's *-container) sit in a high-chroma part of
-// the ramp, so a vivid seed color comes through there at close to full
-// intensity - "neon". Only those two spots get a separate, chroma-reduced
-// palette; tone 80 (dark's primary/secondary/tertiary) is left alone since
-// it already reads fine at full chroma.
-const MUTED_BUTTON_CHROMA_FACTOR = 0.6;
-
 type Axis = 'p' | 's' | 't' | 'n' | 'nv' | 'error' | 'success';
 
 interface RoleSpec {
   axis: Axis;
   lightTone: number;
   darkTone: number;
-  // Chroma-mute factor at each end (see MUTED_BUTTON_CHROMA_FACTOR above) -
-  // 1 (full chroma, the default) unless a role is specifically the "neon"
-  // spot for its axis.
-  lightChroma?: number;
-  darkChroma?: number;
   // How much of `shift` this role feels - 1 (full) by default. primary/
   // secondary/tertiary/error/success (and their on-* pairs) are set to 0 -
   // they're already tuned to look right regardless of the seed colors' own
@@ -279,6 +268,10 @@ interface RoleSpec {
   // direction should still carry them along rather than leave them static
   // forever.
   naturalDirectionOnly?: boolean;
+  // For primary/secondary/tertiary/error/success only - their chroma is
+  // Seeds.dimBaseline flat, in both themes, completely independent of
+  // `shift` (which only moves their tone, via naturalDirectionOnly above).
+  dimmable?: boolean;
 }
 
 // isDark + shiftTone < 0 = dark going darker; !isDark + shiftTone > 0 =
@@ -289,18 +282,9 @@ function naturalDirectionMultiplier(isDark: boolean, shiftTone: number): number 
   return (isDark ? shiftTone < 0 : shiftTone > 0) ? 1 : 0;
 }
 
-const lerp = (a: number, b: number, t: number) => a + (b - a) * t;
-
-// Dark-mode-only: primary/secondary/tertiary/error/success stay full
-// chroma in dark mode normally (see MUTED_BUTTON_CHROMA_FACTOR above -
-// dark's tone 80 already reads fine at full chroma against a dark
-// surface). But as dark mode dims further (shift going negative - see
-// naturalDirectionOnly), the surface gets darker while these roles'
-// chroma doesn't, so they start reading as neon against the now much
-// darker page. Light mode doesn't have this problem - its equivalent
-// roles are already muted (lightChroma) regardless of shift - so this
-// only kicks in for isDark.
-const DARK_DIM_MIN_CHROMA_FACTOR = MUTED_BUTTON_CHROMA_FACTOR;
+// primary/secondary/tertiary/error/success's chroma, flat in both themes,
+// fully independent of Seeds.shift - overridden by Seeds.dimBaseline.
+const DIM_CHROMA_BASELINE = 0.4;
 
 // One row per role that varies between light and dark - buildScheme picks
 // lightTone/lightChroma or darkTone/darkChroma depending on isDark, then
@@ -308,26 +292,25 @@ const DARK_DIM_MIN_CHROMA_FACTOR = MUTED_BUTTON_CHROMA_FACTOR;
 // colors aren't here - they don't vary between themes at all (see
 // WHEEL_TONE above), though they do still get shifted.
 const ROLE_SPECS: Record<string, RoleSpec> = {
-  'primary': {axis: 'p', lightTone: 40, darkTone: 80, lightChroma: MUTED_BUTTON_CHROMA_FACTOR, naturalDirectionOnly: true},
+  'primary': {axis: 'p', lightTone: 40, darkTone: 80, naturalDirectionOnly: true, dimmable: true},
   'on-primary': {axis: 'p', lightTone: 96, darkTone: 20, naturalDirectionOnly: true},
-  'primary-container': {axis: 'p', lightTone: 90, darkTone: 30, darkChroma: MUTED_BUTTON_CHROMA_FACTOR},
+  'primary-container': {axis: 'p', lightTone: 90, darkTone: 30, dimmable: true},
   'on-primary-container': {axis: 'p', lightTone: 10, darkTone: 90},
-  'secondary': {axis: 's', lightTone: 40, darkTone: 80, lightChroma: MUTED_BUTTON_CHROMA_FACTOR, naturalDirectionOnly: true},
+  'secondary': {axis: 's', lightTone: 40, darkTone: 80, naturalDirectionOnly: true, dimmable: true},
   'on-secondary': {axis: 's', lightTone: 96, darkTone: 20, naturalDirectionOnly: true},
-  'secondary-container': {axis: 's', lightTone: 90, darkTone: 30, darkChroma: MUTED_BUTTON_CHROMA_FACTOR},
+  'secondary-container': {axis: 's', lightTone: 90, darkTone: 30, dimmable: true},
   'on-secondary-container': {axis: 's', lightTone: 10, darkTone: 90},
-  'tertiary': {axis: 't', lightTone: 40, darkTone: 80, lightChroma: MUTED_BUTTON_CHROMA_FACTOR, naturalDirectionOnly: true},
+  'tertiary': {axis: 't', lightTone: 40, darkTone: 80, naturalDirectionOnly: true, dimmable: true},
   'on-tertiary': {axis: 't', lightTone: 96, darkTone: 20, naturalDirectionOnly: true},
-  'tertiary-container': {axis: 't', lightTone: 90, darkTone: 30, darkChroma: MUTED_BUTTON_CHROMA_FACTOR},
+  'tertiary-container': {axis: 't', lightTone: 90, darkTone: 30, dimmable: true},
   'on-tertiary-container': {axis: 't', lightTone: 10, darkTone: 90},
   // error/success: same shape as primary/secondary/tertiary above - see
   // the file header comment for why they're not just seeds like those 3.
   // Same naturalDirectionOnly treatment too - they're buttons, not derived
   // roles, so they shouldn't move except per naturalDirectionMultiplier.
-  'error': {axis: 'error', lightTone: 40, darkTone: 80, lightChroma: MUTED_BUTTON_CHROMA_FACTOR, naturalDirectionOnly: true},
+  'error': {axis: 'error', lightTone: 40, darkTone: 80, naturalDirectionOnly: true, dimmable: true},
   'on-error': {axis: 'error', lightTone: 96, darkTone: 20, naturalDirectionOnly: true},
-  'success':
-      {axis: 'success', lightTone: 40, darkTone: 80, lightChroma: MUTED_BUTTON_CHROMA_FACTOR, naturalDirectionOnly: true},
+  'success': {axis: 'success', lightTone: 40, darkTone: 80, naturalDirectionOnly: true, dimmable: true},
   'on-success': {axis: 'success', lightTone: 96, darkTone: 20, naturalDirectionOnly: true},
   'surface': {axis: 'n', lightTone: 98, darkTone: 6},
   'on-surface': {axis: 'n', lightTone: 10, darkTone: 90},
@@ -367,10 +350,7 @@ export function buildScheme(
     const multiplier = spec.naturalDirectionOnly
         ? naturalDirectionMultiplier(isDark, shiftTone)
         : (spec.shiftMultiplier ?? 1);
-    let chromaFactor = (isDark ? spec.darkChroma : spec.lightChroma) ?? 1;
-    if (spec.naturalDirectionOnly && isDark) {
-      chromaFactor *= lerp(1, DARK_DIM_MIN_CHROMA_FACTOR, multiplier * Math.abs(seeds.shift ?? 0));
-    }
+    const chromaFactor = spec.dimmable ? (seeds.dimBaseline ?? DIM_CHROMA_BASELINE) : 1;
     const palette = chromaFactor === 1 ? base : TonalPalette.fromHueAndChroma(base.hue, base.chroma * chromaFactor);
     roles[name] = hexFromArgb(palette.tone(clampTone(tone + shiftTone * multiplier)));
   }
