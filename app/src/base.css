@@ -93,14 +93,8 @@
     input, select, textarea, button {
         @apply input-like;
     }
-    /* Same MD3 state layer as btn-* (see the comment above btn-filled) -
-       a plain <button> with no color variant is still a button, and
-       should still show it's clickable the same way. */
+
     button {
-        /* Overrides input-like's hover/focus border change - a button's
-           state layer below is the whole affordance, MD3 doesn't also
-           swap the border color on a button the way it does for a text
-           field. */
         @apply enabled:hover:cursor-pointer
             enabled:hover:border-c-outline enabled:focus:border-c-outline enabled:focus-within:border-c-outline
             enabled:hover:[background-color:color-mix(in_oklab,var(--color-c-on-surface)_8%,var(--color-c-surface-container-low))]
@@ -130,16 +124,6 @@
 }
 
 @utility input-like {
-    /* text-base font-normal: fixed, not left to inherit - otherwise every
-       field's rendered size/weight depends on whatever ambient text-*
-       class happens to be active on its parent container, which drifts
-       silently from page to page. MD3 calls this "Body Large" (16px/400)
-       for text field input.
-       Hover/focus signal via border-color, not a fill-tint - matches MD3's
-       outlined text field: hover strengthens to on-surface, focus becomes
-       primary. Buttons use a fill-tint state layer instead (see btn-filled
-       and the button rule below) - different mechanism because a button
-       has a fill to tint and a field doesn't. */
     @apply text-c-on-surface
         text-base font-normal
         bg-c-surface-container-low
@@ -195,31 +179,14 @@
 }
 
 /* For a box that should sit flush with the page (no tone step) but still
-   needs a drawn boundary. Prefer surface-1..4 for anything that's stacked. */
+   needs a drawn boundary. Prefer surface-1..4 for anything stacked. */
 @utility surface-outlined {
     background: var(--color-c-surface);
     border: 1px solid var(--color-c-outline-variant);
     @apply text-c-on-surface rounded-md p-3;
 }
 
-/* Filled buttons: pick a variant class instead of restyling from scratch. */
-/*
- * MD3 "state layer": hover/focus on a filled button isn't an outline or a
- * fixed lighten/darken - it's a translucent tint of the button's own on-*
- * color blended into its fill (8% for hover, 12% for focus/press). Because
- * the tint is the ON color, this correctly lightens light-text-on-dark
- * buttons and darkens dark-text-on-light ones, whichever the variant is,
- * with no per-variant branching needed elsewhere. border-none: buttons
- * still pick up input-like's border from the base `button` rule otherwise.
- */
 @utility btn-filled {
-    /* enabled:, not just hover:/focus-visible: on the color variants below -
-       plain :hover still matches a disabled element if the pointer is over
-       it (disabled only blocks click/focus, not CSS hover), so without this
-       a disabled button would still tint on hover. pointer-events-none
-       would also stop that, but it stops the disabled cursor from showing
-       too - enabled: only touches the state-layer, cursor-not-allowed still
-       works normally. */
     @apply px-3 py-1 rounded font-medium border-none enabled:hover:cursor-pointer
         disabled:opacity-38 disabled:cursor-not-allowed;
 }
@@ -249,13 +216,6 @@
         enabled:focus-visible:[background-color:color-mix(in_oklab,var(--color-c-on-success)_12%,var(--color-c-success))];
 }
 
-/*
- * MD3's medium-emphasis variant: colored border + colored text, no fill.
- * Same state-layer idea as btn-filled, just blended into transparent
- * instead of into a solid fill. btn-outlined alone is the neutral default
- * (MD3's actual base "Outlined Button" isn't tied to a color); the color
- * suffixes are this app's own extension, same pattern as btn-filled's.
- */
 @utility btn-outlined {
     @apply px-3 py-1 rounded font-medium bg-transparent border enabled:hover:cursor-pointer
         border-c-outline text-c-on-surface

@@ -35,9 +35,11 @@ What each group is for:
 - **Tertiary**: a contrasting accent used sparingly to balance primary and
   secondary - badges, highlights, an input field's accent.
 - **Error / Success**: destructive (delete) and confirming (save/done)
-  actions and states. Aliases onto `maroon`/`green` from the categorical
-  set below rather than being generated independently - see "Categorical
-  colors".
+  actions and states. Built the same way as primary/secondary/tertiary
+  (fixed reference hue, harmonized toward primary, muted for a light-mode
+  button vs. full chroma for a dark-mode one) rather than being generated
+  from a seed color - MD3 treats error as a fixed, non-seed color, and
+  there's no MD3 "success" at all.
 - **Surface**: backgrounds. Plain `surface` for the page background;
   `surface-container-*` (or the `surface-1..4` base-layer classes) for
   anything stacked visually above the page, to create depth without a new
@@ -67,31 +69,21 @@ If you catch yourself mixing pairs (e.g. `text-c-on-primary` on a
 ## Categorical colors
 
 For chart series and user-assignable tag colors, where you need several
-mutually distinct colors rather than one semantic role: `rosewater`,
-`flamingo`, `pink`, `mauve`, `red`, `maroon`, `peach`, `yellow`, `green`,
-`teal`, `sky`, `sapphire`, `blue`, `lavender` (14 total, same `--color-c-*`
-/ `c-*` convention as everything else). Each one also has an `on-<name>`
-pair (e.g. `on-rosewater`) for text/icons placed on top of it.
-Same pairing rule as `primary`/`on-primary`.
+mutually distinct colors rather than one semantic role: `pink`, `red`,
+`yellow`, `green`, `blue` (same `--color-c-*` / `c-*` convention as
+everything else). Each one comes as a pair of variants - `<name>` (vivid/
+dark) and `<name>-pale` (pale/light) - each with its own `on-<name>` /
+`on-<name>-pale` text pair. Same pairing rule as `primary`/`on-primary`.
 
-These are fixed reference hues nudged up to 15 degrees toward the primary
-seed color, so the set still feels like it belongs in the theme.
-
-## Error and success
-
-`error`/`success` are generated as aliases onto `maroon`/`green` from the
-categorical set.
-
-`red`/`yellow`/`green` in the categorical set are plain colors, not the
-same thing as `error`/`success` - don't assume `red` means "error" just
-because it looks red.
+don't assume `red` means "error" just because it's red.
+There is `error` and `on-error` for that.
 
 ## Base layer
 
 ponkotsu is the opinionated layer on top of Tailwind v4's and includes a base style.
 Preflight: plain `<h1>`/`<button>`/`<input>`/`<table>` markup gets a
 themed look for free, so you only reach for a class to set layout or pick
-a color/surface variant.
+a color/surface variant. Try and avoid adjusting font size, margins and the like on buttons and stuff.
 
 **Elevation is a numbered ladder, not one flat "container" style** -
 nesting depth comes from stepping up the tone, not repeating a box:

@@ -19,9 +19,14 @@ Clone it, generate a palette once, copy the result into your app's stylesheet.
    {
      "primary": "#D7BA7D",
      "secondary": "#5AA9E6",
-     "tertiary": "#C77DFF"
+     "tertiary": "#C77DFF",
+     "shift": 0
    }
    ```
+
+   You can make dark/light mode darker, or lighter by using the `shift` value,
+   which is a number from -1 to 1 that dims or brightens the generated
+   theme without hurting contrast. 
 
 2. `npm install` at least once.
 
@@ -56,7 +61,7 @@ Every color is `c-<role>`, used like any Tailwind color: `bg-c-primary`,
 | `outline`, `outline-variant` | borders and dividers |
 | `error` / `on-error` | destructive stuff (delete) |
 | `success` / `on-success` | confirming stuff (save, done) |
-| `rosewater`, `flamingo`, `pink`, `mauve`, `red`, `maroon`, `peach`, `yellow`, `green`, `teal`, `sky`, `sapphire`, `blue`, `lavender` (also includes a `on-<name>` for each) | a set of 14 colors that stay distinct from each other no matter your seed colors |
+| `pink`, `red`, `yellow`, `green`, `blue` (each also has an `on-<name>` and a paler `<name>-pale` / `on-<name>-pale`) | a set of regular colors |
 
 **The one rule**: only put `on-X` text on an `X` background. `on-primary`
 text goes on `primary`, never on `surface` or anything else. Mixing them
