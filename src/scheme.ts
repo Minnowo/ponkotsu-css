@@ -234,8 +234,8 @@ const STATE_LAYER_FILL_PAIRS: Array<[string, string]> = [
 // rather than baking in one specific background, so it still composites
 // correctly however it's placed.
 const STATE_LAYER_TINT_ROLES = ['primary', 'secondary', 'tertiary', 'error', 'success', 'on-surface'];
-const STATE_LAYER_HOVER_PERCENT = 8;
-const STATE_LAYER_FOCUS_PERCENT = 12;
+const STATE_LAYER_HOVER_PERCENT = 12;
+const STATE_LAYER_FOCUS_PERCENT = 24;
 
 export function corePaletteFromSeeds(seeds: Seeds): CorePalette {
   return CorePalette.contentFromColors({
