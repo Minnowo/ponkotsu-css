@@ -33,6 +33,29 @@ function ColorField({label, value, onChange}: {label: string; value: string; onC
   );
 }
 
+// Not a color - a uniform tone shift applied within whichever theme (light
+// or dark) is being previewed (see Seeds.shift in scheme.ts). -1 = as dark
+// as that theme goes, +1 = as light as that theme goes, 0 = unshifted.
+// Affects both the Light and Dark panels below, each shifted from its own
+// baseline.
+function RangeField({label, value, onChange}: {label: string; value: number; onChange: (value: number) => void}) {
+  return (
+    <label class="flex items-center gap-2 text-sm">
+      <input
+        type="range"
+        min={-1}
+        max={1}
+        step={0.01}
+        value={value}
+        onInput={(e) => onChange(Number((e.target as HTMLInputElement).value))}
+        class="w-32 cursor-pointer"
+      />
+      <span>{label}</span>
+      <span class="text-c-on-surface-variant">{value.toFixed(2)}</span>
+    </label>
+  );
+}
+
 const CATEGORICAL_BASE_NAMES = [
   'pink', 'red', 'yellow', 'green', 'blue',
 ];
@@ -83,11 +106,24 @@ function CategoricalSwatches({names}: {names: string[]}) {
   );
 }
 
-function ThemePreview({title, roles}: {title: string; roles: Roles}) {
+function ThemePreview({title, roles, showWheel}: {title: string; roles: Roles; showWheel: boolean}) {
   const style = toCssVars(roles) as unknown as JSX.CSSProperties;
   return (
     <div style={style} class="surface-1 flex flex-col gap-4">
       <h2>{title}</h2>
+
+      {showWheel && (
+        <section class="flex flex-col gap-2">
+          <h3>Categorical (charts / tags)</h3>
+          <p class="text-c-on-surface-variant text-xs mb-0">
+            Fixed hues, harmonized toward primary - distinct from each other, related to the theme. Each color has
+            a vivid/dark and a pale/light variant (dark half of the wheel, then the light half). error/success
+            alias red/green from this set (see below).
+          </p>
+          <CategoricalSwatches names={CATEGORICAL_NAMES} />
+          <CategoricalPieChart names={CATEGORICAL_NAMES} />
+        </section>
+      )}
 
       <section class="flex flex-col gap-2">
         <h3>Buttons</h3>
@@ -270,17 +306,6 @@ function ThemePreview({title, roles}: {title: string; roles: Roles}) {
           <div class="h-6 w-16 rounded-sm border-2 border-c-outline-variant" />
         </div>
       </section>
-
-      <section class="flex flex-col gap-2">
-        <h3>Categorical (charts / tags)</h3>
-        <p class="text-c-on-surface-variant text-xs mb-0">
-          Fixed hues, harmonized toward primary - distinct from each other, related to the theme. Each color has a
-          vivid/dark and a pale/light variant (dark half of the wheel, then the light half). error/success alias
-          red/green from this set (see below).
-        </p>
-        <CategoricalSwatches names={CATEGORICAL_NAMES} />
-        <CategoricalPieChart names={CATEGORICAL_NAMES} />
-      </section>
     </div>
   );
 }
@@ -290,6 +315,7 @@ export function App() {
     primary: '#D7BA7D',
     secondary: '#5AA9E6',
     tertiary: '#C77DFF',
+    shift: 0,
   });
 
   const {light, dark} = useMemo(() => {
@@ -302,6 +328,12 @@ export function App() {
 
   const [font, setFont] = useState<'M PLUS 1' | 'M PLUS 2'>('M PLUS 1');
   const [copied, setCopied] = useState(false);
+  // 'split' compares both side by side; 'light'/'dark' show just one full
+  // width, with the page itself (not just the panel) switching to that
+  // theme - a light panel sitting on an always-dark page makes its colors
+  // hard to judge in isolation.
+  const [view, setView] = useState<'split' | 'light' | 'dark'>('split');
+  const [showWheel, setShowWheel] = useState(true);
   // Mirrors generate.ts's output.
   const cssText =
       `@import 'tailwindcss';\n\n` +
@@ -317,7 +349,7 @@ export function App() {
   // <body> lives outside this component tree, so set fontFamily here
   // directly rather than via a custom property, and let it inherit down.
   const pageStyle = {
-    ...toCssVars(dark),
+    ...toCssVars(view === 'light' ? light : dark),
     fontFamily: `'${font}', system-ui, sans-serif`,
   } as unknown as JSX.CSSProperties;
 
@@ -338,21 +370,68 @@ export function App() {
             value={seeds.tertiary}
             onChange={(hex) => setSeeds({...seeds, tertiary: hex})}
           />
+          <RangeField
+            label="Shift"
+            value={seeds.shift ?? 0}
+            onChange={(value) => setSeeds({...seeds, shift: value})}
+          />
           <button
             class="btn-secondary"
             onClick={() => setFont(font === 'M PLUS 1' ? 'M PLUS 2' : 'M PLUS 1')}
           >
             Font: {font}
           </button>
+          <div class="flex gap-1">
+            <button
+              class={view === 'split' ? 'btn-primary' : 'btn-outlined'}
+              onClick={() => setView('split')}
+            >
+              Split
+            </button>
+            <button
+              class={view === 'light' ? 'btn-primary' : 'btn-outlined'}
+              onClick={() => setView('light')}
+            >
+              Light only
+            </button>
+            <button
+              class={view === 'dark' ? 'btn-primary' : 'btn-outlined'}
+              onClick={() => setView('dark')}
+            >
+              Dark only
+            </button>
+          </div>
+          <button
+            class={showWheel ? 'btn-primary' : 'btn-outlined'}
+            onClick={() => setShowWheel(!showWheel)}
+          >
+            Wheel: {showWheel ? 'on' : 'off'}
+          </button>
           <button class="btn-primary ml-auto" onClick={copyCss}>
             {copied ? 'Copied!' : 'Copy CSS'}
           </button>
         </div>
 
-        <div class="grid grid-cols-1 gap-4 md:grid-cols-2">
-          <ThemePreview title="Light" roles={light} />
-          <ThemePreview title="Dark" roles={dark} />
-        </div>
+        {view === 'split' && (
+          <div class="grid grid-cols-1 gap-4 md:grid-cols-2">
+            <ThemePreview
+              title={`Light (shift ${(seeds.shift ?? 0).toFixed(2)})`}
+              roles={light}
+              showWheel={showWheel}
+            />
+            <ThemePreview
+              title={`Dark (shift ${(seeds.shift ?? 0).toFixed(2)})`}
+              roles={dark}
+              showWheel={showWheel}
+            />
+          </div>
+        )}
+        {view === 'light' && (
+          <ThemePreview title={`Light (shift ${(seeds.shift ?? 0).toFixed(2)})`} roles={light} showWheel={showWheel} />
+        )}
+        {view === 'dark' && (
+          <ThemePreview title={`Dark (shift ${(seeds.shift ?? 0).toFixed(2)})`} roles={dark} showWheel={showWheel} />
+        )}
       </div>
     </div>
   );
