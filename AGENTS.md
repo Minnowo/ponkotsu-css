@@ -22,7 +22,7 @@ Every token is `--color-c-<role>`, exposed to Tailwind as `bg-c-<role>`,
 | Secondary | `secondary`, `on-secondary`, `secondary-container`, `on-secondary-container` |
 | Tertiary | `tertiary`, `on-tertiary`, `tertiary-container`, `on-tertiary-container` |
 | Error / Success | `error`, `on-error`, `success`, `on-success` |
-| Surface | `surface`, `on-surface`, `on-surface-variant`, `surface-container-lowest`, `surface-container-low`, `surface-container`, `surface-container-high`, `surface-container-highest`, `surface-dim`, `surface-bright` |
+| Surface | `surface`, `on-surface`, `on-surface-variant`, `surface-container-1`..`surface-container-6`, `surface-dim`, `surface-bright` |
 | Outline | `outline`, `outline-variant` |
 | Inverse | `inverse-surface`, `inverse-on-surface`, `inverse-primary` |
 
@@ -90,10 +90,12 @@ nesting depth comes from stepping up the tone, not repeating a box:
 
 | Class | Backing tone |
 |---|---|
-| `surface-1` | `surface-container-low` (first box on the page) |
-| `surface-2` | `surface-container` (nested inside a `surface-1`) |
-| `surface-3` | `surface-container-high` (nested inside that) |
-| `surface-4` | `surface-container-highest` (deepest) |
+| `surface-1` | `surface-container-1` (first box on the page) |
+| `surface-2` | `surface-container-2` (nested inside a `surface-1`) |
+| `surface-3` | `surface-container-3` (nested inside that) |
+| `surface-4` | `surface-container-4` (nested inside that) |
+| `surface-5` | `surface-container-5` (nested inside that) |
+| `surface-6` | `surface-container-6` (deepest) |
 | `surface-outlined` | `surface` + `outline-variant` border, no tone step (rare - a box flush with the page that still needs a boundary) |
 
 Each level also gets a thin `outline-variant` border - the tone step alone
@@ -120,7 +122,7 @@ carries the meaning within each:
 buttons) and `<role>-hover-tint` / `<role>-focus-tint` (translucent, for
 outlined buttons/anything over a non-solid background) exist for
 `primary`/`secondary`/`tertiary`/`error`/`success`, plus
-`surface-container-low-hover`/`-focus` and `on-surface-hover-tint`/
+`surface-container-1-hover`/`-focus` and `on-surface-hover-tint`/
 `-focus-tint` for the neutral (colorless) button. Reuse these directly on
 a custom component instead of writing a new `color-mix()` - that's why
 they're generated up front rather than left inline in `base.css`.

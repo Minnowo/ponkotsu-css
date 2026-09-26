@@ -225,7 +225,7 @@ const STATE_LAYER_FILL_PAIRS: Array<[string, string]> = [
   ['success', 'on-success'],
   // The base (colorless) button and neutral outlined button don't have
   // their own on-* role - they tint with on-surface instead.
-  ['surface-container-low', 'on-surface'],
+  ['surface-container-1', 'on-surface'],
 ];
 
 // Same idea, for outlined buttons: the tint is the role's own color at
@@ -310,16 +310,27 @@ const ROLE_SPECS: Record<string, RoleSpec> = {
   // roles, so they shouldn't move except per naturalDirectionMultiplier.
   'error': {axis: 'error', lightTone: 40, darkTone: 80, naturalDirectionOnly: true, dimmable: true},
   'on-error': {axis: 'error', lightTone: 96, darkTone: 20, naturalDirectionOnly: true},
+  'error-container': {axis: 'error', lightTone: 90, darkTone: 30, dimmable: true},
+  'on-error-container': {axis: 'error', lightTone: 10, darkTone: 90},
   'success': {axis: 'success', lightTone: 40, darkTone: 80, naturalDirectionOnly: true, dimmable: true},
   'on-success': {axis: 'success', lightTone: 96, darkTone: 20, naturalDirectionOnly: true},
+  'success-container': {axis: 'success', lightTone: 90, darkTone: 30, dimmable: true},
+  'on-success-container': {axis: 'success', lightTone: 10, darkTone: 90},
   'surface': {axis: 'n', lightTone: 98, darkTone: 6},
   'on-surface': {axis: 'n', lightTone: 10, darkTone: 90},
   'on-surface-variant': {axis: 'nv', lightTone: 30, darkTone: 80},
-  'surface-container-lowest': {axis: 'n', lightTone: 100, darkTone: 4},
-  'surface-container-low': {axis: 'n', lightTone: 96, darkTone: 10},
-  'surface-container': {axis: 'n', lightTone: 94, darkTone: 12},
-  'surface-container-high': {axis: 'n', lightTone: 92, darkTone: 17},
-  'surface-container-highest': {axis: 'n', lightTone: 90, darkTone: 22},
+  // Numbered 1..6 to match the surface-N utility classes directly (surface-N
+  // backs onto surface-container-N) - MD3's own named scale (lowest/low/
+  // [plain]/high/highest) stopped at 4 steps and had no name left to give
+  // steps 5/6, so this repo dropped the names entirely rather than mix
+  // named and numbered. No surface-container-0: MD3's "lowest" tone wasn't
+  // used by anything (nothing nests below surface-1), so it's not generated.
+  'surface-container-1': {axis: 'n', lightTone: 96, darkTone: 10},
+  'surface-container-2': {axis: 'n', lightTone: 94, darkTone: 12},
+  'surface-container-3': {axis: 'n', lightTone: 92, darkTone: 17},
+  'surface-container-4': {axis: 'n', lightTone: 90, darkTone: 22},
+  'surface-container-5': {axis: 'n', lightTone: 88, darkTone: 27},
+  'surface-container-6': {axis: 'n', lightTone: 86, darkTone: 32},
   'surface-dim': {axis: 'n', lightTone: 87, darkTone: 6},
   'surface-bright': {axis: 'n', lightTone: 98, darkTone: 24},
   'outline': {axis: 'nv', lightTone: 50, darkTone: 60},

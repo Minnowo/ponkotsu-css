@@ -53,7 +53,7 @@ and base style adds some extra classes for ease of use.
 
 #### Boxes 
 
-The `surface-<n>` class (n is 1-4 inclusive) is meant for nested containers.
+The `surface-<n>` class (n is 1-6 inclusive) is meant for nested containers.
 The higher `n` the more the surface color changes for contrast.
 
 Just bump the number each time you nest one box inside another:
@@ -63,9 +63,12 @@ Just bump the number each time you nest one box inside another:
   <div class="surface-2">
     a box inside that box
     <div class="surface-3">
-      the second last box
       <div class="surface-4">
-         there is no box deeper
+        <div class="surface-5">
+          <div class="surface-6">
+            there is no box deeper
+          </div>
+        </div>
       </div>
     </div>
   </div>
@@ -117,6 +120,8 @@ For example:
 
 All the defined colors are in the table below, (remember you need to include `c-` when using them from Tailwind utilities)
 
+**The one rule**: if the background color is `X`, the text color should be `on-X`, this guarantees the text is readable on the surface.
+
 | Foreground | Background | Description |
 |---|---|---|
 | `on-primary` | `primary` | Main brand/action color |
@@ -142,22 +147,25 @@ All the defined colors are in the table below, (remember you need to include `c-
 | - | `error-focus` | Focus color of `error` |
 | - | `error-hover-tint` | Translucent version of `error`, for hover over a transparent/non-solid background |
 | - | `error-focus-tint` | Translucent version of `error`, for focus over a transparent/non-solid background |
+| `on-error-container` | `error-container` | Container using error color |
 | `on-success` | `success` | Success or confirmation state |
 | - | `success-hover` | Hover color of `success` |
 | - | `success-focus` | Focus color of `success` |
 | - | `success-hover-tint` | Translucent version of `success`, for hover over a transparent/non-solid background |
 | - | `success-focus-tint` | Translucent version of `success`, for focus over a transparent/non-solid background |
+| `on-success-container` | `success-container` | Container using success color |
 | `on-surface` | `surface` | Page background and primary content |
 | `on-surface-variant` | `surface` | Lower-emphasis text on the page background (e.g. a caption or hint) |
 | - | `on-surface-hover-tint` | Translucent version of `on-surface`, for hover over a transparent/non-solid background - what the neutral `btn-outlined` uses |
 | - | `on-surface-focus-tint` | Translucent version of `on-surface`, for focus over a transparent/non-solid background - what the neutral `btn-outlined` uses |
-| `on-surface` | `surface-container-lowest` | Lowest surface container |
-| `on-surface` | `surface-container-low` | Low surface container |
-| - | `surface-container-low-hover` | Hover color of `surface-container-low`, used by the neutral (colorless) `<button>` |
-| - | `surface-container-low-focus` | Focus color of `surface-container-low`, used by the neutral (colorless) `<button>` |
-| `on-surface` | `surface-container` | Default surface container |
-| `on-surface` | `surface-container-high` | High surface container |
-| `on-surface` | `surface-container-highest` | Highest surface container |
+| `on-surface` | `surface-container-1` | Backs `surface-1` |
+| - | `surface-container-1-hover` | Hover color of `surface-container-1`, used by the neutral (colorless) `<button>` |
+| - | `surface-container-1-focus` | Focus color of `surface-container-1`, used by the neutral (colorless) `<button>` |
+| `on-surface` | `surface-container-2` | Backs `surface-2` |
+| `on-surface` | `surface-container-3` | Backs `surface-3` |
+| `on-surface` | `surface-container-4` | Backs `surface-4` |
+| `on-surface` | `surface-container-5` | Backs `surface-5` |
+| `on-surface` | `surface-container-6` | Backs `surface-6` |
 | `on-surface` | `surface-dim` | Dimmed surface |
 | `on-surface` | `surface-bright` | Bright surface |
 | `inverse-on-surface` | `inverse-surface` | Inverted surface for things like toasts and tooltips |

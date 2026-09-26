@@ -45,11 +45,11 @@
 
     code, pre {
         font-family: ui-monospace, monospace;
-        background: var(--color-c-surface-container-low);
+        background: var(--color-c-surface-container-1);
         @apply rounded-sm;
     }
     code {
-        @apply px-1 py-0.5 text-sm;
+        @apply px-1 py-0.5;
     }
     pre {
         @apply p-3 overflow-x-auto;
@@ -68,12 +68,13 @@
         @apply px-2 py-1 text-left;
     }
     th {
-        background: var(--color-c-surface-container);
+        background: var(--color-c-surface-container-2);
         font-weight: 500;
     }
 
     fieldset {
         border: 1px solid var(--color-c-outline-variant);
+        min-width: 0;
         @apply rounded-md p-3;
     }
     legend {
@@ -95,9 +96,10 @@
         -webkit-touch-callout: none;
         @apply enabled:hover:cursor-pointer
             enabled:hover:border-c-outline enabled:focus:border-c-outline enabled:focus-within:border-c-outline
-            enabled:hover:bg-c-surface-container-low-hover
-            enabled:focus-visible:bg-c-surface-container-low-focus
-            enabled:active:bg-c-surface-container-low-focus;
+            enabled:hover:bg-c-surface-container-1-hover
+            enabled:active:bg-c-surface-container-1-focus
+            std-focus!
+            ;
     }
 
     input[type="checkbox"], input[type="radio"], input[type="range"] {
@@ -119,13 +121,13 @@
     @apply focus-visible:outline-solid
         focus-visible:outline-2
         focus-visible:outline-c-primary
-        focus-visible:outline-offset-2;
+        focus-visible:outline-offset-2
 }
 
 @utility input-like {
     @apply text-c-on-surface
         text-base font-normal
-        bg-c-surface-container-low
+        bg-c-surface-container-1
 
         rounded-sm
         px-2
@@ -139,13 +141,13 @@
         focus-within:outline-none
         std-focus
 
-        disabled:bg-c-surface-container
+        disabled:bg-c-surface-container-2
         disabled:text-c-on-surface-variant
         disabled:border-c-outline-variant
         disabled:cursor-not-allowed
         disabled:opacity-60
 
-        aria-disabled:bg-c-surface-container
+        aria-disabled:bg-c-surface-container-2
         aria-disabled:text-c-on-surface-variant
         aria-disabled:border-c-outline-variant
         aria-disabled:cursor-not-allowed
@@ -154,31 +156,38 @@
 }
 
 /*
- * No surface-0: the page background is `surface`, set on <body>.
- * surface-1 = surface-container-low     (first box on the page)
- * surface-2 = surface-container         (nested inside a surface-1)
- * surface-3 = surface-container-high    (nested inside that)
- * surface-4 = surface-container-highest (deepest; MD3's card default)
+ * surface-N backs onto surface-container-N directly, so the number tells
+ * you the tone step - no separate name mapping to remember. Starts at 1,
+ * not 0: the page background is plain `surface`, set on <body>, so nothing
+ * needs to nest *below* surface-1.
  */
 @utility surface-1 {
-    background: var(--color-c-surface-container-low);
+    background: var(--color-c-surface-container-1);
     @apply text-c-on-surface border border-c-outline-variant rounded-md p-3;
 }
 @utility surface-2 {
-    background: var(--color-c-surface-container);
+    background: var(--color-c-surface-container-2);
     @apply text-c-on-surface border border-c-outline-variant rounded-md p-3;
 }
 @utility surface-3 {
-    background: var(--color-c-surface-container-high);
+    background: var(--color-c-surface-container-3);
     @apply text-c-on-surface border border-c-outline-variant rounded-md p-3;
 }
 @utility surface-4 {
-    background: var(--color-c-surface-container-highest);
+    background: var(--color-c-surface-container-4);
+    @apply text-c-on-surface border border-c-outline-variant rounded-md p-3;
+}
+@utility surface-5 {
+    background: var(--color-c-surface-container-5);
+    @apply text-c-on-surface border border-c-outline-variant rounded-md p-3;
+}
+@utility surface-6 {
+    background: var(--color-c-surface-container-6);
     @apply text-c-on-surface border border-c-outline-variant rounded-md p-3;
 }
 
 /* For a box that should sit flush with the page (no tone step) but still
-   needs a drawn boundary. Prefer surface-1..4 for anything stacked. */
+   needs a drawn boundary. Prefer surface-1..6 for anything stacked. */
 @utility surface-outlined {
     @apply text-c-on-surface border border-c-outline-variant rounded-md p-3;
 }
@@ -189,57 +198,57 @@
 }
 @utility btn-primary {
     @apply btn-filled bg-c-primary text-c-on-primary
-        enabled:hover:bg-c-primary-hover enabled:focus-visible:bg-c-primary-focus enabled:active:bg-c-primary-focus;
+        enabled:hover:bg-c-primary-hover enabled:active:bg-c-primary-focus;
 }
 @utility btn-secondary {
     @apply btn-filled bg-c-secondary text-c-on-secondary
-        enabled:hover:bg-c-secondary-hover enabled:focus-visible:bg-c-secondary-focus
+        enabled:hover:bg-c-secondary-hover
         enabled:active:bg-c-secondary-focus;
 }
 @utility btn-tertiary {
     @apply btn-filled bg-c-tertiary text-c-on-tertiary
-        enabled:hover:bg-c-tertiary-hover enabled:focus-visible:bg-c-tertiary-focus
+        enabled:hover:bg-c-tertiary-hover
         enabled:active:bg-c-tertiary-focus;
 }
 @utility btn-error {
     @apply btn-filled bg-c-error text-c-on-error
-        enabled:hover:bg-c-error-hover enabled:focus-visible:bg-c-error-focus enabled:active:bg-c-error-focus;
+        enabled:hover:bg-c-error-hover enabled:active:bg-c-error-focus;
 }
 @utility btn-success {
     @apply btn-filled bg-c-success text-c-on-success
-        enabled:hover:bg-c-success-hover enabled:focus-visible:bg-c-success-focus
+        enabled:hover:bg-c-success-hover
         enabled:active:bg-c-success-focus;
 }
 
 @utility btn-outlined {
     @apply px-3 py-1 rounded font-medium bg-transparent border enabled:hover:cursor-pointer
         border-c-outline text-c-on-surface
-        enabled:hover:bg-c-on-surface-hover-tint enabled:focus-visible:bg-c-on-surface-focus-tint
+        enabled:hover:bg-c-on-surface-hover-tint
         enabled:active:bg-c-on-surface-focus-tint
         disabled:opacity-38 disabled:cursor-not-allowed;
 }
 @utility btn-outlined-primary {
     @apply btn-outlined border-c-primary text-c-primary
-        enabled:hover:bg-c-primary-hover-tint enabled:focus-visible:bg-c-primary-focus-tint
+        enabled:hover:bg-c-primary-hover-tint
         enabled:active:bg-c-primary-focus-tint;
 }
 @utility btn-outlined-secondary {
     @apply btn-outlined border-c-secondary text-c-secondary
-        enabled:hover:bg-c-secondary-hover-tint enabled:focus-visible:bg-c-secondary-focus-tint
+        enabled:hover:bg-c-secondary-hover-tint
         enabled:active:bg-c-secondary-focus-tint;
 }
 @utility btn-outlined-tertiary {
     @apply btn-outlined border-c-tertiary text-c-tertiary
-        enabled:hover:bg-c-tertiary-hover-tint enabled:focus-visible:bg-c-tertiary-focus-tint
+        enabled:hover:bg-c-tertiary-hover-tint
         enabled:active:bg-c-tertiary-focus-tint;
 }
 @utility btn-outlined-error {
     @apply btn-outlined border-c-error text-c-error
-        enabled:hover:bg-c-error-hover-tint enabled:focus-visible:bg-c-error-focus-tint
+        enabled:hover:bg-c-error-hover-tint
         enabled:active:bg-c-error-focus-tint;
 }
 @utility btn-outlined-success {
     @apply btn-outlined border-c-success text-c-success
-        enabled:hover:bg-c-success-hover-tint enabled:focus-visible:bg-c-success-focus-tint
+        enabled:hover:bg-c-success-hover-tint
         enabled:active:bg-c-success-focus-tint;
 }
