@@ -134,10 +134,10 @@
         py-1
         border
         border-c-outline
-        enabled:hover:border-c-on-surface
-        enabled:focus:border-c-primary
-        enabled:focus:border-2
-        enabled:focus-within:border-c-primary
+        not-disabled:not-aria-disabled:hover:border-c-on-surface
+        not-disabled:not-aria-disabled:focus:border-c-primary
+        not-disabled:not-aria-disabled:focus:border-2
+        not-disabled:not-aria-disabled:focus-within:border-c-primary
         focus:outline-none
         focus-within:outline-none
         std-focus

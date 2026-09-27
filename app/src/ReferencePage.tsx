@@ -29,15 +29,15 @@ type InteractionRole = (typeof INTERACTION_ROLES)[number];
 // a dynamically interpolated class name would never get generated.
 const CUSTOM_BUTTON_CLASSES: Record<InteractionRole, string> = {
   primary:
-    'rounded px-3 py-1 font-medium bg-c-primary text-c-on-primary enabled:hover:bg-c-primary-hover enabled:active:bg-c-primary-focus',
+    'rounded px-3 py-1 font-medium border-none bg-c-primary text-c-on-primary enabled:hover:bg-c-primary-hover enabled:active:bg-c-primary-focus',
   secondary:
-    'rounded px-3 py-1 font-medium bg-c-secondary text-c-on-secondary enabled:hover:bg-c-secondary-hover enabled:active:bg-c-secondary-focus',
+    'rounded px-3 py-1 font-medium border-none bg-c-secondary text-c-on-secondary enabled:hover:bg-c-secondary-hover enabled:active:bg-c-secondary-focus',
   tertiary:
-    'rounded px-3 py-1 font-medium bg-c-tertiary text-c-on-tertiary enabled:hover:bg-c-tertiary-hover enabled:active:bg-c-tertiary-focus',
+    'rounded px-3 py-1 font-medium border-none bg-c-tertiary text-c-on-tertiary enabled:hover:bg-c-tertiary-hover enabled:active:bg-c-tertiary-focus',
   error:
-    'rounded px-3 py-1 font-medium bg-c-error text-c-on-error enabled:hover:bg-c-error-hover enabled:active:bg-c-error-focus',
+    'rounded px-3 py-1 font-medium border-none bg-c-error text-c-on-error enabled:hover:bg-c-error-hover enabled:active:bg-c-error-focus',
   success:
-    'rounded px-3 py-1 font-medium bg-c-success text-c-on-success enabled:hover:bg-c-success-hover enabled:active:bg-c-success-focus',
+    'rounded px-3 py-1 font-medium border-none bg-c-success text-c-on-success enabled:hover:bg-c-success-hover enabled:active:bg-c-success-focus',
 };
 
 // Tint variants are translucent, meant for hovering over an existing
