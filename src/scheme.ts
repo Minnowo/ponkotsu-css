@@ -191,24 +191,26 @@ function harmonizedPalette(hex: string, primaryArgb: number): TonalPalette {
 
 export type Roles = Record<string, string>;
 
-// Each categorical color gets 2 tones instead of 1 flat one - a vivid/dark
-// variant (<name>) and a pale/light variant (l-<name>, "l" for "light") -
-// since a single
-// shared tone wasn't enough to keep every color visually distinct even
-// after widening hue gaps (see CATEGORICAL_SEEDS above). Same tones for
-// both themes, like the single-tone version before it: a light, muted
-// chip with dark text (or vice versa) reads fine on both a near-black page
-// and a near-white one, so there's no need to re-tune per theme.
+// Each categorical color gets 2 tones instead of 1 flat one - a pale/light
+// variant (<name>) as the default, and a vivid/dark variant (d-<name>, "d"
+// for "dark") as the special/emphasis one - since a single shared tone
+// wasn't enough to keep every color visually distinct even after widening
+// hue gaps (see CATEGORICAL_SEEDS above). Same tones for both themes, like
+// the single-tone version before it: a light, muted chip with dark text (or
+// vice versa) reads fine on both a near-black page and a near-white one, so
+// there's no need to re-tune per theme.
 // Both variants sit on the lighter half of the tone scale (62/80, not
 // actually "dark") - both get dark on-text (20), not light, since a light
 // on-tone against either background reads as washed-out/low-contrast
 // (this is what made btn-error/btn-success look off in dark mode - their
 // bg/text were built from this pair, and on-tone 95 on a tone-65 bg was
 // under 3:1 contrast).
-const WHEEL_TONE = 62;
+const WHEEL_TONE = 80;
 const WHEEL_ON_TONE = 20;
-const WHEEL_PALE_TONE = 80;
-const WHEEL_PALE_ON_TONE = 20;
+const WHEEL_L_TONE = 87;
+const WHEEL_L_ON_TONE = 20;
+const WHEEL_D_TONE = 72;
+const WHEEL_D_ON_TONE = 20;
 
 // MD3's "state layer": hover/focus on a filled button tints the fill with
 // a translucent wash of the button's own on-* color (8% hover, 12%
@@ -284,7 +286,7 @@ function naturalDirectionMultiplier(isDark: boolean, shiftTone: number): number 
 
 // primary/secondary/tertiary/error/success's chroma, flat in both themes,
 // fully independent of Seeds.shift - overridden by Seeds.dimBaseline.
-const DIM_CHROMA_BASELINE = 0.4;
+const DIM_CHROMA_BASELINE = 0.65;
 
 // One row per role that varies between light and dark - buildScheme picks
 // lightTone/lightChroma or darkTone/darkChroma depending on isDark, then
@@ -353,6 +355,7 @@ export function buildScheme(
     error: errorPalette, success: successPalette,
   };
   const shiftTone = (seeds.shift ?? 0) * MAX_SHIFT_TONE;
+  const dimBaseline = seeds.dimBaseline ?? DIM_CHROMA_BASELINE;
 
   const roles: Roles = {};
   for (const [name, spec] of Object.entries(ROLE_SPECS)) {
@@ -361,7 +364,7 @@ export function buildScheme(
     const multiplier = spec.naturalDirectionOnly
         ? naturalDirectionMultiplier(isDark, shiftTone)
         : (spec.shiftMultiplier ?? 1);
-    const chromaFactor = spec.dimmable ? (seeds.dimBaseline ?? DIM_CHROMA_BASELINE) : 1;
+    const chromaFactor = spec.dimmable ? dimBaseline : 1;
     const palette = chromaFactor === 1 ? base : TonalPalette.fromHueAndChroma(base.hue, base.chroma * chromaFactor);
     roles[name] = hexFromArgb(palette.tone(clampTone(tone + shiftTone * multiplier)));
   }
@@ -374,13 +377,27 @@ export function buildScheme(
   // tones in both themes; same naturalDirectionOnly treatment as
   // primary/secondary/tertiary/error/success above.
   const wheelShiftTone = shiftTone * naturalDirectionMultiplier(isDark, shiftTone);
+  // Scaled by dimBaseline relative to its own default, same as
+  // primary/secondary/tertiary/error/success above, so the categorical set
+  // saturates/mutes along with everything else instead of staying flat -
+  // at the default dimBaseline this is exactly MUTED_CHROMA_FACTOR, same as
+  // before dimBaseline affected these at all.
+  // const categoricalChromaFactor = MUTED_CHROMA_FACTOR * (dimBaseline / DIM_CHROMA_BASELINE);
+  const categoricalChromaFactor = dimBaseline;
   for (const [name, hex] of Object.entries(CATEGORICAL_SEEDS)) {
     const harmonized = Hct.fromInt(Blend.harmonize(argbFromHex(hex), primaryArgb));
-    const palette = TonalPalette.fromHueAndChroma(harmonized.hue, harmonized.chroma * MUTED_CHROMA_FACTOR);
+    const palette = TonalPalette.fromHueAndChroma(harmonized.hue, harmonized.chroma * categoricalChromaFactor);
     roles[name] = hexFromArgb(palette.tone(clampTone(WHEEL_TONE + wheelShiftTone)));
     roles[`on-${name}`] = hexFromArgb(palette.tone(clampTone(WHEEL_ON_TONE + wheelShiftTone)));
-    roles[`l-${name}`] = hexFromArgb(palette.tone(clampTone(WHEEL_PALE_TONE + wheelShiftTone)));
-    roles[`on-l-${name}`] = hexFromArgb(palette.tone(clampTone(WHEEL_PALE_ON_TONE + wheelShiftTone)));
+
+    // literally just randomly shifted this, seems good enough
+    const paletteD = TonalPalette.fromHueAndChroma(((360+harmonized.hue-16)%360), harmonized.chroma * categoricalChromaFactor);
+    roles[`d-${name}`] = hexFromArgb(paletteD.tone(clampTone(WHEEL_D_TONE + wheelShiftTone)));
+    roles[`on-d-${name}`] = hexFromArgb(paletteD.tone(clampTone(WHEEL_D_ON_TONE + wheelShiftTone)));
+
+    const paletteL = TonalPalette.fromHueAndChroma(((360+harmonized.hue+26)%360), harmonized.chroma * categoricalChromaFactor);
+    roles[`l-${name}`] = hexFromArgb(paletteL.tone(clampTone(WHEEL_L_TONE + wheelShiftTone)));
+    roles[`on-l-${name}`] = hexFromArgb(paletteL.tone(clampTone(WHEEL_L_ON_TONE + wheelShiftTone)));
   }
 
   // Precomputed hover/focus state-layer colors - see STATE_LAYER_FILL_PAIRS

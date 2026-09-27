@@ -1,5 +1,11 @@
 import {useState} from 'preact/hooks';
-import {CATEGORICAL_BASE_NAMES, CategoricalPieChart, CategoricalSwatches} from './controls';
+import {
+  CATEGORICAL_BASE_NAMES,
+  CategoricalLineChart,
+  CategoricalPieChart,
+  CategoricalStackedBar,
+  CategoricalSwatches,
+} from './controls';
 
 // A live demo above the code that produces it - the standard "component
 // then its source" docs layout, so the reference page can be scanned
@@ -249,9 +255,15 @@ function ColorSwatch({fg, bg}: {fg: string; bg: string}) {
   );
 }
 
+// Grouped d-/normal/l- per hue (not all-normals-then-all-lights-then-
+// all-darks) so the 3 variants of the same hue sit next to each other -
+// makes it easy to compare how distinct light/dark actually are from normal.
+const ALL_CATEGORICAL_NAMES = CATEGORICAL_BASE_NAMES.flatMap((n) => [`d-${n}`, n, `l-${n}`]);
+
 function ColorsSection() {
   return (
     <div class="flex flex-col gap-4">
+    <div class="overflow-x-scroll">
       <table>
         <thead>
           <tr>
@@ -274,16 +286,42 @@ function ColorsSection() {
           ))}
         </tbody>
       </table>
-      <section class="flex flex-col gap-2">
+        </div>
+      <section class="flex flex-col gap-3">
         <h3>Categorical</h3>
         <p class="text-c-on-surface-variant text-xs mb-0">
-          There are 10 fixed hues that shift toward the primary color. Mainly for cases where you need a specific color by name.
+          There are 5 fixed hues that shift toward the primary color. Mainly for cases where you need a specific
+          color by name. Each has a pale (default), a light (<code>l-</code>), and a dark/vivid (<code>d-</code>)
+          variant.
         </p>
-        <div class="flex flex-wrap items-center gap-4">
-          <CategoricalSwatches names={[...CATEGORICAL_BASE_NAMES, ...CATEGORICAL_BASE_NAMES.map((n) => `l-${n}`)]} />
-          <CategoricalPieChart
-            names={[...CATEGORICAL_BASE_NAMES, ...CATEGORICAL_BASE_NAMES.map((n) => `l-${n}`)]}
-          />
+        <div class="flex flex-col gap-2">
+          <span class="text-c-on-surface-variant text-xs">Pale (default)</span>
+          <div class="flex flex-wrap items-center gap-4">
+            <CategoricalSwatches names={CATEGORICAL_BASE_NAMES} />
+            <CategoricalPieChart names={CATEGORICAL_BASE_NAMES} />
+          </div>
+        </div>
+        <div class="flex flex-col gap-2">
+          <span class="text-c-on-surface-variant text-xs">Light (l-*)</span>
+          <div class="flex flex-wrap items-center gap-4">
+            <CategoricalSwatches names={CATEGORICAL_BASE_NAMES.map((n) => `l-${n}`)} />
+            <CategoricalPieChart names={CATEGORICAL_BASE_NAMES.map((n) => `l-${n}`)} />
+          </div>
+        </div>
+        <div class="flex flex-col gap-2">
+          <span class="text-c-on-surface-variant text-xs">Dark/vivid (d-*)</span>
+          <div class="flex flex-wrap items-center gap-4">
+            <CategoricalSwatches names={CATEGORICAL_BASE_NAMES.map((n) => `d-${n}`)} />
+            <CategoricalPieChart names={CATEGORICAL_BASE_NAMES.map((n) => `d-${n}`)} />
+          </div>
+        </div>
+        <div class="flex flex-col gap-2">
+          <span class="text-c-on-surface-variant text-xs">All variants together (stacked bar)</span>
+          <CategoricalStackedBar names={ALL_CATEGORICAL_NAMES} />
+        </div>
+        <div class="flex flex-col gap-2">
+          <span class="text-c-on-surface-variant text-xs">All variants together (line chart)</span>
+          <CategoricalLineChart names={ALL_CATEGORICAL_NAMES} />
         </div>
       </section>
     </div>

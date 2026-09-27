@@ -25,8 +25,8 @@ export function App() {
     primary: '#D7BA7D',
     secondary: '#5AA9E6',
     tertiary: '#C77DFF',
-    shift: 0,
-    dimBaseline: 0.4,
+    shift: 0.3,
+    dimBaseline: 0.6,
   });
   const [isDark, setIsDark] = useState(true);
   const [font, setFont] = useState<'M PLUS 1' | 'M PLUS 2'>('M PLUS 1');
@@ -72,7 +72,7 @@ export function App() {
   } as unknown as JSX.CSSProperties;
 
   return (
-    <div style={pageStyle} class="min-h-screen overflow-x-hidden bg-c-surface text-c-on-surface">
+    <div style={pageStyle} class="min-h-screen bg-c-surface text-c-on-surface">
       <div class="flex justify-center gap-1 p-3 border-b border-c-outline-variant">
         <button class={page === 'app' ? 'btn-primary' : 'btn-outlined'} onClick={() => setPage('app')}>
           Theme Preview

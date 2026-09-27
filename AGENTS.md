@@ -71,9 +71,10 @@ If you catch yourself mixing pairs (e.g. `text-c-on-primary` on a
 For chart series and user-assignable tag colors, where you need several
 mutually distinct colors rather than one semantic role: `pink`, `red`,
 `yellow`, `green`, `blue` (same `--color-c-*` / `c-*` convention as
-everything else). Each one comes as a pair of variants - `<name>` (vivid/
-dark) and `l-<name>` (pale/light) - each with its own `on-<name>` /
-`on-l-<name>` text pair. Same pairing rule as `primary`/`on-primary`.
+everything else). Each one comes as a pair of variants - `<name>` (pale/
+light, the default) and `d-<name>` (vivid/dark, the special/emphasis one) -
+each with its own `on-<name>` / `on-d-<name>` text pair. Same pairing rule
+as `primary`/`on-primary`.
 
 don't assume `red` means "error" just because it's red.
 There is `error` and `on-error` for that.

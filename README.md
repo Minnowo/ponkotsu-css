@@ -170,16 +170,21 @@ All the defined colors are in the table below, (remember you need to include `c-
 | `on-surface` | `surface-bright` | Bright surface |
 | `inverse-on-surface` | `inverse-surface` | Inverted surface for things like toasts and tooltips |
 | `inverse-primary` | - | Accent for a link/action on top of `inverse-surface` |
-| `on-pink` | `pink` | Pink color |
+| `on-pink` | `pink` | Pink color (pale, default) |
 | `on-l-pink` | `l-pink` | Lighter pink color |
-| `on-red` | `red` | Red color |
+| `on-d-pink` | `d-pink` | Darker/more vivid pink color |
+| `on-red` | `red` | Red color (pale, default) |
 | `on-l-red` | `l-red` | Lighter red color |
-| `on-yellow` | `yellow` | Yellow color |
+| `on-d-red` | `d-red` | Darker/more vivid red color |
+| `on-yellow` | `yellow` | Yellow color (pale, default) |
 | `on-l-yellow` | `l-yellow` | Lighter yellow color |
-| `on-green` | `green` | Green color |
+| `on-d-yellow` | `d-yellow` | Darker/more vivid yellow color |
+| `on-green` | `green` | Green color (pale, default) |
 | `on-l-green` | `l-green` | Lighter green color |
-| `on-blue` | `blue` | Blue color |
+| `on-d-green` | `d-green` | Darker/more vivid green color |
+| `on-blue` | `blue` | Blue color (pale, default) |
 | `on-l-blue` | `l-blue` | Lighter blue color |
+| `on-d-blue` | `d-blue` | Darker/more vivid blue color |
 | - | `outline` | Borders and dividers |
 | - | `outline-variant` | Subtle borders and dividers |
 

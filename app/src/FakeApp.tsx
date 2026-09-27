@@ -172,7 +172,7 @@ function DashboardView() {
             <div class="h-full rounded-full bg-c-secondary" style={{width: '62%'}} />
           </div>
         </div>
-        <div class="surface-1 flex items-center gap-3">
+        <div class="surface-1 flex flex-wrap items-center gap-3">
           <CategoricalPieChart names={MACROS.map((m) => m.color)} />
           <div class="flex flex-col gap-1 text-sm">
             {MACROS.map((m) => (

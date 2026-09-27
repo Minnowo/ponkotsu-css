@@ -60,15 +60,12 @@ export function RangeField({
   );
 }
 
-export const CATEGORICAL_BASE_NAMES = ['pink', 'red', 'yellow', 'green', 'blue'];
-
-// Each base name has a vivid/dark variant and a pale/light variant (see
-// WHEEL_TONE in scheme.ts) - grouped dark-half/light-half here rather than
-// interleaved, which read better than alternating dark/light/dark/light.
-export const CATEGORICAL_NAMES = [
-  ...CATEGORICAL_BASE_NAMES,
-  ...CATEGORICAL_BASE_NAMES.map((name) => `l-${name}`),
-];
+// Each base name has a pale/light variant (the default, plain name) and a
+// vivid/dark variant (d-<name>) (see WHEEL_TONE in scheme.ts). Ordered by
+// harmonized hue (not insertion order) so neighbors on the wheel/swatch
+// list sit next to each other - makes it easy to spot two hues that read
+// as too close together.
+export const CATEGORICAL_BASE_NAMES = ['red', 'yellow', 'green', 'blue', 'pink'];
 
 // Quick visual gut-check for how a set of categorical colors read together
 // (e.g. as pie chart slices) rather than as isolated swatches.
@@ -105,5 +102,54 @@ export function CategoricalSwatches({names}: {names: string[]}) {
         </div>
       ))}
     </div>
+  );
+}
+
+// Equal-width segments - there's no real "value" per series here, this is
+// just a gut-check for how a whole categorical set reads stacked together
+// (e.g. a 100%-stacked bar chart) rather than as isolated swatches.
+export function CategoricalStackedBar({names}: {names: string[]}) {
+  return (
+    <div class="flex h-10 w-full max-w-2xl overflow-hidden rounded-sm border border-c-outline-variant">
+      {names.map((name) => (
+        <div key={name} class="h-full flex-1" style={{background: `var(--color-c-${name})`} as JSX.CSSProperties} />
+      ))}
+    </div>
+  );
+}
+
+const LINE_CHART_POINTS = 8;
+
+// Deterministic pseudo-random in [0, 1) from a name+index seed - just needs
+// to look varied point-to-point (no real data backs this, it's only here to
+// show how the categorical set reads as chart lines rather than isolated
+// swatches). A plain string hash of `${seed}-${i}` doesn't work for this:
+// since only the trailing digit changes between points, the hash - and so
+// the output - increases almost linearly with i, drawing a straight
+// diagonal instead of noise. Feeding the hash through sin() decorrelates
+// consecutive i's the way classic GLSL-style pseudo-noise does.
+function pseudoRandom(seed: string, i: number): number {
+  let hash = 0;
+  for (const char of seed) hash = (hash * 31 + char.charCodeAt(0)) >>> 0;
+  const x = Math.sin(hash + i * 12.9898) * 43758.5453;
+  return x - Math.floor(x);
+}
+
+export function CategoricalLineChart({names}: {names: string[]}) {
+  const width = 320;
+  const height = 140;
+  const padding = 8;
+  const stepX = (width - padding * 2) / (LINE_CHART_POINTS - 1);
+  return (
+    <svg width={width} height={height} class="flex-shrink-0">
+      {names.map((name) => {
+        const points = Array.from({length: LINE_CHART_POINTS}, (_, i) => {
+          const x = padding + i * stepX;
+          const y = padding + pseudoRandom(name, i) * (height - padding * 2);
+          return `${x},${y}`;
+        }).join(' ');
+        return <polyline key={name} points={points} fill="none" stroke={`var(--color-c-${name})`} stroke-width="2" />;
+      })}
+    </svg>
   );
 }
