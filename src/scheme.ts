@@ -377,25 +377,29 @@ export function buildScheme(
   // tones in both themes; same naturalDirectionOnly treatment as
   // primary/secondary/tertiary/error/success above.
   const wheelShiftTone = shiftTone * naturalDirectionMultiplier(isDark, shiftTone);
-  // Scaled by dimBaseline relative to its own default, same as
-  // primary/secondary/tertiary/error/success above, so the categorical set
-  // saturates/mutes along with everything else instead of staying flat -
-  // at the default dimBaseline this is exactly MUTED_CHROMA_FACTOR, same as
-  // before dimBaseline affected these at all.
-  // const categoricalChromaFactor = MUTED_CHROMA_FACTOR * (dimBaseline / DIM_CHROMA_BASELINE);
-  const categoricalChromaFactor = dimBaseline;
+  // Scaled by dimBaseline, same as primary/secondary/tertiary/error/success
+  // above - so a maxed-out dimBaseline reads as the same saturation as an
+  // unshifted primary, rather than each seed's own (unrelated) chroma.
+  // Chroma is borrowed from the primary axis palette (only hue comes from
+  // the seed) for the same reason: each categorical seed hex has its own
+  // arbitrary chroma, so scaling that by dimBaseline made the wheel drift
+  // out of saturation-sync with primary/secondary/tertiary as dimBaseline
+  // moved - tying it to primary's own chroma keeps them matched at every
+  // dimBaseline value, not just the one they happened to be tuned at.
+  const categoricalChromaFactor = dimBaseline*1.5;
+  const primaryChroma = axisPalette.p.chroma;
   for (const [name, hex] of Object.entries(CATEGORICAL_SEEDS)) {
     const harmonized = Hct.fromInt(Blend.harmonize(argbFromHex(hex), primaryArgb));
-    const palette = TonalPalette.fromHueAndChroma(harmonized.hue, harmonized.chroma * categoricalChromaFactor);
+    const palette = TonalPalette.fromHueAndChroma(harmonized.hue, primaryChroma * categoricalChromaFactor);
     roles[name] = hexFromArgb(palette.tone(clampTone(WHEEL_TONE + wheelShiftTone)));
     roles[`on-${name}`] = hexFromArgb(palette.tone(clampTone(WHEEL_ON_TONE + wheelShiftTone)));
 
     // literally just randomly shifted this, seems good enough
-    const paletteD = TonalPalette.fromHueAndChroma(((360+harmonized.hue-16)%360), harmonized.chroma * categoricalChromaFactor);
+    const paletteD = TonalPalette.fromHueAndChroma(((360+harmonized.hue-16)%360), primaryChroma * categoricalChromaFactor);
     roles[`d-${name}`] = hexFromArgb(paletteD.tone(clampTone(WHEEL_D_TONE + wheelShiftTone)));
     roles[`on-d-${name}`] = hexFromArgb(paletteD.tone(clampTone(WHEEL_D_ON_TONE + wheelShiftTone)));
 
-    const paletteL = TonalPalette.fromHueAndChroma(((360+harmonized.hue+26)%360), harmonized.chroma * categoricalChromaFactor);
+    const paletteL = TonalPalette.fromHueAndChroma(((360+harmonized.hue)%360), primaryChroma * categoricalChromaFactor);
     roles[`l-${name}`] = hexFromArgb(paletteL.tone(clampTone(WHEEL_L_TONE + wheelShiftTone)));
     roles[`on-l-${name}`] = hexFromArgb(paletteL.tone(clampTone(WHEEL_L_ON_TONE + wheelShiftTone)));
   }

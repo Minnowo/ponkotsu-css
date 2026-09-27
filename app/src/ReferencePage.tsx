@@ -287,7 +287,7 @@ function ColorsSection() {
         </tbody>
       </table>
         </div>
-      <section class="flex flex-col gap-3">
+      <section class="flex flex-col gap-3 surface-1">
         <h3>Categorical</h3>
         <p class="text-c-on-surface-variant text-xs mb-0">
           There are 5 fixed hues that shift toward the primary color. Mainly for cases where you need a specific
@@ -433,7 +433,7 @@ function ButtonsSection() {
 
 function BaseElementsSection() {
   return (
-    <section class="flex flex-col gap-3">
+    <section class="flex flex-col gap-3 surface-1">
       <h3>Base HTML elements</h3>
       <p class="text-c-on-surface-variant text-xs mb-0">
         This is what plain markup without any classes looks like.
@@ -473,7 +473,7 @@ function BaseElementsSection() {
         </tbody>
       </table>
 
-      <fieldset class="flex flex-col gap-2">
+      <fieldset class="flex flex-col gap-2 surface-2">
         <legend>Fieldset legend</legend>
         <label class="flex flex-col gap-1">
           Text input

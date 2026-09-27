@@ -102,12 +102,12 @@
             ;
     }
 
-    input[type="checkbox"], input[type="radio"], input[type="range"] {
+    input[type="checkbox"], input[type="radio"], input[type="range"], input[type="color"] {
         all: revert;
         accent-color: var(--color-c-primary);
         @apply hover:cursor-pointer std-focus;
     }
-    input[type="checkbox"]:disabled, input[type="radio"]:disabled, input[type="range"]:disabled {
+    input[type="checkbox"]:disabled, input[type="radio"]:disabled, input[type="range"]:disabled, input[type="color"]:disabled {
         @apply cursor-not-allowed opacity-60;
     }
 
@@ -136,6 +136,7 @@
         border-c-outline
         enabled:hover:border-c-on-surface
         enabled:focus:border-c-primary
+        enabled:focus:border-2
         enabled:focus-within:border-c-primary
         focus:outline-none
         focus-within:outline-none

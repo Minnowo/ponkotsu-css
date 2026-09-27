@@ -162,14 +162,14 @@ function DashboardView() {
           <span class="text-c-on-surface-variant text-xs">Calories today</span>
           <p class="text-2xl font-semibold mb-1">1,570 / 2,200</p>
           <div class="h-2 rounded-full bg-c-surface-container-3 overflow-hidden">
-            <div class="h-full rounded-full bg-c-primary" style={{width: '71%'}} />
+            <div class="h-full rounded-full bg-c-yellow" style={{width: '71%'}} />
           </div>
         </div>
         <div class="surface-1">
           <span class="text-c-on-surface-variant text-xs">Water intake</span>
           <p class="text-2xl font-semibold mb-1">5 / 8 cups</p>
           <div class="h-2 rounded-full bg-c-surface-container-3 overflow-hidden">
-            <div class="h-full rounded-full bg-c-secondary" style={{width: '62%'}} />
+            <div class="h-full rounded-full bg-c-blue" style={{width: '62%'}} />
           </div>
         </div>
         <div class="surface-1 flex flex-wrap items-center gap-3">
