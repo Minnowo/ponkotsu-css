@@ -1,7 +1,7 @@
 {
-  "primary": "#D7BA7D",
+  "primary": "#D2AE61",
   "secondary": "#5AA9E6",
   "tertiary": "#C77DFF",
-  "shift": 0.4,
-  "dimBaseline": 0.65
+  "shift": 0.3,
+  "dimBaseline": 0.60
 }

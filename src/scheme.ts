@@ -191,26 +191,38 @@ function harmonizedPalette(hex: string, primaryArgb: number): TonalPalette {
 
 export type Roles = Record<string, string>;
 
-// Each categorical color gets 2 tones instead of 1 flat one - a pale/light
-// variant (<name>) as the default, and a vivid/dark variant (d-<name>, "d"
-// for "dark") as the special/emphasis one - since a single shared tone
-// wasn't enough to keep every color visually distinct even after widening
-// hue gaps (see CATEGORICAL_SEEDS above). Same tones for both themes, like
-// the single-tone version before it: a light, muted chip with dark text (or
-// vice versa) reads fine on both a near-black page and a near-white one, so
-// there's no need to re-tune per theme.
-// Both variants sit on the lighter half of the tone scale (62/80, not
-// actually "dark") - both get dark on-text (20), not light, since a light
-// on-tone against either background reads as washed-out/low-contrast
+// Each categorical color gets 3 tones instead of 1 flat one - a pale/light
+// variant (<name>) as the default, an even paler variant (l-<name>), and a
+// vivid/dark variant (d-<name>) as the special/emphasis one - since a
+// single shared tone wasn't enough to keep every color visually distinct
+// even after widening hue gaps (see CATEGORICAL_SEEDS above).
+// Unlike the single-tone version before it, these DO need separate light/
+// dark theme tones now: a pale chip (tone 72-87) reads fine against a
+// near-black dark-theme page, but nearly disappears against a light-theme
+// page that's a similarly high tone - so light theme needs a much lower
+// (darker) chip tone to actually contrast against its own near-white
+// background, the same reason primary/secondary/tertiary flip their tone
+// between themes. The on-tone flips to match, same as primary/secondary's
+// on-* pair - dark theme's pale chip pairs with dark text (tone 20), light
+// theme's darker chip pairs with light text (tone 95); mixing the two
+// (e.g. dark text on light theme's dark chip) reads low-contrast, same
+// failure mode noted below for btn-error/btn-success.
 // (this is what made btn-error/btn-success look off in dark mode - their
 // bg/text were built from this pair, and on-tone 95 on a tone-65 bg was
 // under 3:1 contrast).
-const WHEEL_TONE = 80;
-const WHEEL_ON_TONE = 20;
-const WHEEL_L_TONE = 87;
-const WHEEL_L_ON_TONE = 20;
-const WHEEL_D_TONE = 72;
-const WHEEL_D_ON_TONE = 20;
+const WHEEL_DARK_THEME_TONE = 80;
+const WHEEL_DARK_THEME_ON_TONE = 20;
+const WHEEL_DARK_THEME_L_TONE = 87;
+const WHEEL_DARK_THEME_L_ON_TONE = 20;
+const WHEEL_DARK_THEME_D_TONE = 72;
+const WHEEL_DARK_THEME_D_ON_TONE = 20;
+
+const WHEEL_LIGHT_THEME_TONE = 56;
+const WHEEL_LIGHT_THEME_ON_TONE = 95;
+const WHEEL_LIGHT_THEME_L_TONE = 64;
+const WHEEL_LIGHT_THEME_L_ON_TONE = 95;
+const WHEEL_LIGHT_THEME_D_TONE = 48;
+const WHEEL_LIGHT_THEME_D_ON_TONE = 95;
 
 // MD3's "state layer": hover/focus on a filled button tints the fill with
 // a translucent wash of the button's own on-* color (8% hover, 12%
@@ -319,8 +331,9 @@ const ROLE_SPECS: Record<string, RoleSpec> = {
   'success-container': {axis: 'success', lightTone: 90, darkTone: 30, dimmable: true},
   'on-success-container': {axis: 'success', lightTone: 10, darkTone: 90},
   'surface': {axis: 'n', lightTone: 98, darkTone: 6},
-  'on-surface': {axis: 'n', lightTone: 10, darkTone: 90},
-  'on-surface-variant': {axis: 'nv', lightTone: 30, darkTone: 80},
+  // Text stays at MD3's tones; shift would push dark-mode text to pure white.
+  'on-surface': {axis: 'n', lightTone: 10, darkTone: 90, shiftMultiplier: 0},
+  'on-surface-variant': {axis: 'nv', lightTone: 30, darkTone: 80, shiftMultiplier: 0},
   // Numbered 1..6 to match the surface-N utility classes directly (surface-N
   // backs onto surface-container-N) - MD3's own named scale (lowest/low/
   // [plain]/high/highest) stopped at 4 steps and had no name left to give
@@ -388,20 +401,26 @@ export function buildScheme(
   // dimBaseline value, not just the one they happened to be tuned at.
   const categoricalChromaFactor = dimBaseline*1.5;
   const primaryChroma = axisPalette.p.chroma;
+  const wheelTone = isDark ? WHEEL_DARK_THEME_TONE : WHEEL_LIGHT_THEME_TONE;
+  const wheelOnTone = isDark ? WHEEL_DARK_THEME_ON_TONE : WHEEL_LIGHT_THEME_ON_TONE;
+  const wheelLTone = isDark ? WHEEL_DARK_THEME_L_TONE : WHEEL_LIGHT_THEME_L_TONE;
+  const wheelLOnTone = isDark ? WHEEL_DARK_THEME_L_ON_TONE : WHEEL_LIGHT_THEME_L_ON_TONE;
+  const wheelDTone = isDark ? WHEEL_DARK_THEME_D_TONE : WHEEL_LIGHT_THEME_D_TONE;
+  const wheelDOnTone = isDark ? WHEEL_DARK_THEME_D_ON_TONE : WHEEL_LIGHT_THEME_D_ON_TONE;
   for (const [name, hex] of Object.entries(CATEGORICAL_SEEDS)) {
     const harmonized = Hct.fromInt(Blend.harmonize(argbFromHex(hex), primaryArgb));
     const palette = TonalPalette.fromHueAndChroma(harmonized.hue, primaryChroma * categoricalChromaFactor);
-    roles[name] = hexFromArgb(palette.tone(clampTone(WHEEL_TONE + wheelShiftTone)));
-    roles[`on-${name}`] = hexFromArgb(palette.tone(clampTone(WHEEL_ON_TONE + wheelShiftTone)));
+    roles[name] = hexFromArgb(palette.tone(clampTone(wheelTone + wheelShiftTone)));
+    roles[`on-${name}`] = hexFromArgb(palette.tone(clampTone(wheelOnTone + wheelShiftTone)));
 
     // literally just randomly shifted this, seems good enough
     const paletteD = TonalPalette.fromHueAndChroma(((360+harmonized.hue-16)%360), primaryChroma * categoricalChromaFactor);
-    roles[`d-${name}`] = hexFromArgb(paletteD.tone(clampTone(WHEEL_D_TONE + wheelShiftTone)));
-    roles[`on-d-${name}`] = hexFromArgb(paletteD.tone(clampTone(WHEEL_D_ON_TONE + wheelShiftTone)));
+    roles[`d-${name}`] = hexFromArgb(paletteD.tone(clampTone(wheelDTone + wheelShiftTone)));
+    roles[`on-d-${name}`] = hexFromArgb(paletteD.tone(clampTone(wheelDOnTone + wheelShiftTone)));
 
     const paletteL = TonalPalette.fromHueAndChroma(((360+harmonized.hue)%360), primaryChroma * categoricalChromaFactor);
-    roles[`l-${name}`] = hexFromArgb(paletteL.tone(clampTone(WHEEL_L_TONE + wheelShiftTone)));
-    roles[`on-l-${name}`] = hexFromArgb(paletteL.tone(clampTone(WHEEL_L_ON_TONE + wheelShiftTone)));
+    roles[`l-${name}`] = hexFromArgb(paletteL.tone(clampTone(wheelLTone + wheelShiftTone)));
+    roles[`on-l-${name}`] = hexFromArgb(paletteL.tone(clampTone(wheelLOnTone + wheelShiftTone)));
   }
 
   // Precomputed hover/focus state-layer colors - see STATE_LAYER_FILL_PAIRS

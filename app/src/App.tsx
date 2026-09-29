@@ -22,7 +22,7 @@ function pageFromHash(hash: string): Page {
 
 export function App() {
   const [seeds, setSeeds] = useState<Seeds>({
-    primary: '#D7BA7D',
+    primary: "#D2AE61",
     secondary: '#5AA9E6',
     tertiary: '#C77DFF',
     shift: 0.3,
