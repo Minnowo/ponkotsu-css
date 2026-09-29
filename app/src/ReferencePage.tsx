@@ -13,8 +13,8 @@ import {
 function Example({code, children}: {code: string; children: preact.ComponentChildren}) {
   return (
     <div class="flex flex-col gap-2">
-      <div class="surface-outlined flex flex-wrap items-center gap-3">{children}</div>
-      <pre class="mb-0 text-xs">
+      <div class="surface-border flex flex-wrap items-center gap-2">{children}</div>
+      <pre class="text-xs">
         <code>{code}</code>
       </pre>
     </div>
@@ -114,17 +114,14 @@ function InteractionColorsSection() {
 
   return (
     <section class="flex flex-col gap-2">
-      <h3>Interaction / state colors</h3>
-      <p class="text-c-on-surface-variant text-xs mb-0">
+      <h2>Interaction / state colors</h2>
+      <small>
         There are four state colors per role: <code>-hover</code>{' '}
         and <code>-focus</code> are opaque colors for replacing a component's
         background, while <code>-hover-tint</code> and <code>-focus-tint</code>{' '}
         are translucent overlays for components that keep their existing
-        background.
-        <br/>
-        <br/>
-        You will need this if you're making custom components.
-      </p>
+        background. You will need this if you're making custom components.
+      </small>
       <label class="flex w-40 flex-col gap-1">
         Role
         <select value={role} onChange={(e) => setRole((e.target as HTMLSelectElement).value as InteractionRole)}>
@@ -198,10 +195,10 @@ function ContainerColorsSection() {
 
   return (
     <section class="flex flex-col gap-2">
-      <h3>Containers</h3>
-      <p class="text-c-on-surface-variant text-xs mb-0">
+      <h2>Containers</h2>
+      <small>
         The roles also have containers.
-      </p>
+      </small>
       <label class="flex w-40 flex-col gap-1">
         Role
         <select value={role} onChange={(e) => setRole((e.target as HTMLSelectElement).value as InteractionRole)}>
@@ -289,38 +286,41 @@ function ColorsSection() {
         </div>
       <section class="flex flex-col gap-3 surface-1">
         <h3>Categorical</h3>
-        <p class="text-c-on-surface-variant text-xs mb-0">
+        <small>
           There are 5 fixed hues that shift toward the primary color. Mainly for cases where you need a specific
           color by name. Each has a pale (default), a light (<code>l-</code>), and a dark/vivid (<code>d-</code>)
           variant.
-        </p>
+        </small>
         <div class="flex flex-col gap-2">
-          <span class="text-c-on-surface-variant text-xs">Pale (default)</span>
+          <small>Pale (default)</small>
           <div class="flex flex-wrap items-center gap-4">
             <CategoricalSwatches names={CATEGORICAL_BASE_NAMES} />
             <CategoricalPieChart names={CATEGORICAL_BASE_NAMES} />
           </div>
+          <CategoricalLineChart names={CATEGORICAL_BASE_NAMES} />
         </div>
         <div class="flex flex-col gap-2">
-          <span class="text-c-on-surface-variant text-xs">Light (l-*)</span>
+          <small>Light (l-*)</small>
           <div class="flex flex-wrap items-center gap-4">
             <CategoricalSwatches names={CATEGORICAL_BASE_NAMES.map((n) => `l-${n}`)} />
             <CategoricalPieChart names={CATEGORICAL_BASE_NAMES.map((n) => `l-${n}`)} />
           </div>
+          <CategoricalLineChart names={CATEGORICAL_BASE_NAMES.map((n) => `l-${n}`)} />
         </div>
         <div class="flex flex-col gap-2">
-          <span class="text-c-on-surface-variant text-xs">Dark/vivid (d-*)</span>
+          <small>Dark/vivid (d-*)</small>
           <div class="flex flex-wrap items-center gap-4">
             <CategoricalSwatches names={CATEGORICAL_BASE_NAMES.map((n) => `d-${n}`)} />
             <CategoricalPieChart names={CATEGORICAL_BASE_NAMES.map((n) => `d-${n}`)} />
           </div>
+          <CategoricalLineChart names={CATEGORICAL_BASE_NAMES.map((n) => `d-${n}`)} />
         </div>
         <div class="flex flex-col gap-2">
-          <span class="text-c-on-surface-variant text-xs">All variants together (stacked bar)</span>
+          <small>All variants together (stacked bar)</small>
           <CategoricalStackedBar names={ALL_CATEGORICAL_NAMES} />
         </div>
         <div class="flex flex-col gap-2">
-          <span class="text-c-on-surface-variant text-xs">All variants together (line chart)</span>
+          <small>All variants together (line chart)</small>
           <CategoricalLineChart names={ALL_CATEGORICAL_NAMES} />
         </div>
       </section>
@@ -331,11 +331,11 @@ function ColorsSection() {
 function SurfacesSection() {
   return (
     <section class="flex flex-col gap-2">
-      <h3>Surfaces</h3>
-      <p class="text-c-on-surface-variant text-xs mb-0">
+      <h2>Surfaces</h2>
+      <small>
         Body is always set as <code>surface</code>, use <code>surface-n</code> for containers meant for nesting.
         (the max value for n is 6)
-      </p>
+      </small>
       <Example
         code={`<div class="surface-1">
   <div class="surface-2">
@@ -349,18 +349,18 @@ function SurfacesSection() {
   </div>
 </div>`}
       >
-        <div class="surface-1">
-          <span class="text-xs font-mono">surface-1</span>
-          <div class="surface-2 mt-2">
-            <span class="text-xs font-mono">surface-2</span>
-            <div class="surface-3 mt-2">
-              <span class="text-xs font-mono">surface-3</span>
-              <div class="surface-4 mt-2">
-                <span class="text-xs font-mono">surface-4</span>
-                <div class="surface-5 mt-2">
-                  <span class="text-xs font-mono">surface-5</span>
-                  <div class="surface-6 mt-2">
-                    <span class="text-xs font-mono">surface-6</span>
+        <div class="surface-1 flex flex-col gap-2">
+          <code>surface-1</code>
+          <div class="surface-2 flex flex-col gap-2">
+            <code>surface-2</code>
+            <div class="surface-3 flex flex-col gap-2">
+              <code>surface-3</code>
+              <div class="surface-4 flex flex-col gap-2">
+                <code>surface-4</code>
+                <div class="surface-5 flex flex-col gap-2">
+                  <code>surface-5</code>
+                  <div class="surface-6">
+                    <code>surface-6</code>
                   </div>
                 </div>
               </div>
@@ -368,13 +368,16 @@ function SurfacesSection() {
           </div>
         </div>
       </Example>
-      <p class="text-c-on-surface-variant text-xs mb-0">
-        <code>surface-outlined</code> has a transparent background - used to have a border on the same surface
-        without nesting.
-      </p>
-      <Example code={'<div class="surface-outlined">...</div>'}>
-        <div class="surface-outlined w-40">
-          <span class="text-xs font-mono">surface-outlined</span>
+      <small>
+        Surfaces have no border. Add <code>surface-border</code> when a box needs a drawn edge: on its own for a box
+        flush with the page, or next to a <code>surface-N</code>.
+      </small>
+      <Example code={'<div class="surface-border">...</div>\n<div class="surface-2 surface-border">...</div>'}>
+        <div class="surface-border w-40">
+          <code>surface-border</code>
+        </div>
+        <div class="surface-2 surface-border w-56">
+          <code>surface-2 surface-border</code>
         </div>
       </Example>
     </section>
@@ -398,11 +401,23 @@ function ButtonsSection() {
   const {filled, outlined} = ROLE_BUTTON_CLASSES[role];
 
   return (
-    <section class="flex flex-col gap-3">
-      <h3>Buttons</h3>
-      <p class="text-c-on-surface-variant text-xs mb-0">
-        Buttons follow roles, and there are emphasis levels.
-      </p>
+    <section class="flex flex-col gap-2">
+      <h2>Buttons</h2>
+      <small>
+        Emphasis goes filled, then outlined, then plain. Use one filled button per group, for the main action.
+        Use outlined for a colored secondary action such as an inline delete. Everything else, including Cancel,
+        is a plain <code>&lt;button&gt;</code>.
+      </small>
+      <Example
+        code={`<button class="btn-success">Save</button>
+<button class="btn-outlined-error">Delete</button>
+<button>Cancel</button>`}
+      >
+        <button class="btn-success">Save</button>
+        <button class="btn-outlined-error">Delete</button>
+        <button>Cancel</button>
+      </Example>
+      <small>Filled and outlined buttons come in every role.</small>
       <label class="flex w-40 flex-col gap-1">
         Role
         <select value={role} onChange={(e) => setRole((e.target as HTMLSelectElement).value as InteractionRole)}>
@@ -434,12 +449,12 @@ function ButtonsSection() {
 function BaseElementsSection() {
   return (
     <section class="flex flex-col gap-3 surface-1">
-      <h3>Base HTML elements</h3>
-      <p class="text-c-on-surface-variant text-xs mb-0">
+      <h2>Base HTML elements</h2>
+      <small>
         This is what plain markup without any classes looks like.
-      </p>
+      </small>
 
-      <div class="flex flex-col gap-1">
+      <div class="flex flex-col gap-2">
         <h1>h1 heading</h1>
         <h2>h2 heading</h2>
         <h3>h3 heading</h3>
@@ -449,7 +464,8 @@ function BaseElementsSection() {
       </div>
 
       <p>
-        A paragraph with a <a href="#">link</a>, and <small>small print</small>. Inline code: <code>c-primary</code>.
+        A paragraph with a <a href="#">link</a>, <strong>strong text</strong>, and <small>small print</small>.
+        Inline code: <code>c-primary</code>.
       </p>
 
       <pre>{'pre-formatted\n  block of text'}</pre>
@@ -491,6 +507,7 @@ function BaseElementsSection() {
           <textarea rows={2} placeholder="Placeholder" />
         </label>
         <button class="self-start">Button</button>
+        <hr />
         <label class="flex flex-row items-center gap-2">
           <input type="checkbox" defaultChecked />
           Checkbox
@@ -516,13 +533,142 @@ function BaseElementsSection() {
   );
 }
 
+const TYPE_ROWS: Array<[preact.ComponentChildren, string, string]> = [
+  [<h1>Page title</h1>, '<h1>', 'One per page. 28px, weight 425.'],
+  [<h2>Section or panel</h2>, '<h2>', 'A panel or section title. 22px, weight 425.'],
+  [<h3>Group in a panel</h3>, '<h3>', 'A group inside a panel. 18px, weight 500.'],
+  [<h4>Small heading</h4>, '<h4>', 'A card or row title. 16px, weight 500.'],
+  [<p>Body text</p>, '<p>', 'Everything else. 16px, weight 400.'],
+  [<label>Field caption</label>, '<label>', 'The caption above a field. 14px, muted.'],
+  [<small>Hint text</small>, '<small>', 'Subtitles, hints, metadata. 14px, muted.'],
+  [
+    <span>
+      Some <strong>emphasis</strong>
+    </span>,
+    '<strong>',
+    'Inline emphasis. Weight 500.',
+  ],
+];
+
+function TypeSection() {
+  return (
+    <section class="flex flex-col gap-2">
+      <h2>Type</h2>
+      <small>
+        Plain elements are already styled. Pick the element by meaning; don't add font-weight, text-size or text-color
+        utilities to restyle it.
+      </small>
+      <div class="overflow-x-auto">
+        <table>
+          <thead>
+            <tr>
+              <th>Looks like</th>
+              <th>Element</th>
+              <th>Use</th>
+            </tr>
+          </thead>
+          <tbody>
+            {TYPE_ROWS.map(([demo, el, use]) => (
+              <tr key={el}>
+                <td>{demo}</td>
+                <td>
+                  <code>{el}</code>
+                </td>
+                <td>{use}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+    </section>
+  );
+}
+
+const SPACING_ROWS: Array<[string, string, string]> = [
+  ['gap-1', '4px', 'Inside one control: a caption and its input, an icon and its text.'],
+  ['gap-2', '8px', 'Between related fields, rows or buttons.'],
+  ['gap-4', '16px', 'Between sections or panels.'],
+  ['p-3', '12px', 'Container padding (built into surface-N).'],
+  ['px-4', '16px', 'Page margin.'],
+];
+
+function SpacingSection() {
+  return (
+    <section class="flex flex-col gap-2">
+      <h2>Spacing</h2>
+      <small>
+        Spacing comes from <code>gap</code> on the parent (<code>flex flex-col gap-2</code>), not margins on the
+        children. Headings, paragraphs and <code>hr</code> have no margin.
+      </small>
+      <div class="overflow-x-auto">
+        <table>
+          <thead>
+            <tr>
+              <th>Class</th>
+              <th>Size</th>
+              <th>Use</th>
+            </tr>
+          </thead>
+          <tbody>
+            {SPACING_ROWS.map(([cls, size, use]) => (
+              <tr key={cls}>
+                <td>
+                  <code>{cls}</code>
+                </td>
+                <td>{size}</td>
+                <td>{use}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+    </section>
+  );
+}
+
+function FormsSection() {
+  return (
+    <section class="flex flex-col gap-2">
+      <h2>Forms</h2>
+      <small>
+        A field is a <code>&lt;label&gt;</code> wrapping its caption and input. A checkbox or radio label reads as body
+        text.
+      </small>
+      <Example
+        code={`<div class="surface-1 flex flex-col gap-2">
+  <label class="flex flex-col gap-1">
+    Note
+    <textarea rows={2} placeholder="Optional" />
+  </label>
+  <label class="flex items-center gap-2">
+    <input type="checkbox" /> Beeps
+  </label>
+</div>`}
+      >
+        <div class="surface-1 flex w-full max-w-md flex-col gap-2">
+          <label class="flex flex-col gap-1">
+            Note
+            <textarea rows={2} placeholder="Optional" />
+          </label>
+          <label class="flex items-center gap-2">
+            <input type="checkbox" /> Beeps
+          </label>
+        </div>
+      </Example>
+    </section>
+  );
+}
+
 export function ReferencePage() {
   return (
-    <div class="flex flex-col gap-6 max-w-5xl mx-auto">
+    <div class="flex flex-col gap-4 max-w-5xl mx-auto">
       <div>
-        <h2>Reference</h2>
-        <p class="text-c-on-surface-variant mb-0">ponkotsu-css reference.</p>
+        <h1>Reference</h1>
+        <small>ponkotsu-css reference.</small>
       </div>
+      <TypeSection />
+      <SpacingSection />
+      <FormsSection />
       <ButtonsSection />
       <InteractionColorsSection />
       <ContainerColorsSection />

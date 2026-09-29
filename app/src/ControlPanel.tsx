@@ -33,7 +33,7 @@ export function ControlPanel({
       {open && (
         <div class="surface-1 flex flex-col gap-3 w-full max-w-72 max-h-[70vh] overflow-y-auto">
           <div class="flex items-center justify-between">
-            <h4 class="mb-0">Theme controls</h4>
+            <h4>Theme controls</h4>
             <button class="btn-outlined" onClick={() => onDarkChange(!isDark)}>
               {isDark ? 'Dark' : 'Light'}
             </button>

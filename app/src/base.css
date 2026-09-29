@@ -16,16 +16,20 @@
     }
 
     h1, h2, h3, h4, h5, h6 {
-        font-weight: 550;
         color: var(--color-c-on-surface);
     }
-    h1 { @apply text-2xl mb-3; }
-    h2 { @apply text-xl mb-2; }
-    h3 { @apply text-lg mb-1; }
-    h4, h5, h6 { @apply text-base mb-1; }
+    h1 { font-size: 1.75rem; line-height: 2.25rem; font-weight: 425; }
+    h2 { font-size: 1.375rem; line-height: 1.75rem; font-weight: 425; }
+    h3 { font-size: 1.125rem; line-height: 1.5rem; font-weight: 500; }
+    h4, h5, h6 { font-size: 1rem; line-height: 1.5rem; font-weight: 500; }
+
+    strong, b {
+        font-weight: 500;
+    }
 
     small {
         color: var(--color-c-on-surface-variant);
+        @apply text-sm;
     }
 
     a {
@@ -40,7 +44,6 @@
     hr {
         border: none;
         border-top: 1px solid var(--color-c-outline-variant);
-        @apply my-4;
     }
 
     code, pre {
@@ -82,24 +85,42 @@
         @apply px-1 text-sm;
     }
 
+    /* A caption doesn't forward clicks/hover to its field; the field itself does. */
     label {
+        color: var(--color-c-on-surface-variant);
+        pointer-events: none;
+        @apply text-sm;
+    }
+    label > * {
+        pointer-events: auto;
+    }
+    label:has(> input[type="checkbox"], > input[type="radio"]) {
         color: var(--color-c-on-surface);
-        @apply text-sm font-medium;
+        pointer-events: auto;
+        @apply text-base;
     }
 
     input, select, textarea, button {
         @apply input-like;
     }
 
+    /* Fields default to a ~20 character width (the size attribute), which stops
+       their containers shrinking on narrow screens. A real width replaces it. */
+    input, select, textarea {
+        min-width: 0;
+    }
+    label > input, label > select, label > textarea {
+        width: 100%;
+    }
+
     button {
         user-select: none;
         -webkit-touch-callout: none;
         @apply enabled:hover:cursor-pointer
-            not-disabled:not-aria-disabled:hover:border-c-outline
             not-disabled:not-aria-disabled:focus:border-c-outline
-            not-disabled:not-aria-disabled:focus:border
+            not-disabled:not-aria-disabled:focus:inset-ring-0
             not-disabled:not-aria-disabled:focus-within:border-c-outline
-            not-disabled:not-aria-disabled:focus-within:border
+            not-disabled:not-aria-disabled:focus-within:inset-ring-0
             enabled:hover:bg-c-surface-container-1-hover
             enabled:active:bg-c-surface-container-1-focus
             std-focus!
@@ -108,6 +129,7 @@
 
     input[type="checkbox"], input[type="radio"], input[type="range"], input[type="color"] {
         all: revert;
+        pointer-events: auto;
         accent-color: var(--color-c-primary);
         @apply hover:cursor-pointer std-focus;
     }
@@ -138,11 +160,13 @@
         py-1
         border
         border-c-outline
-        not-disabled:not-aria-disabled:hover:border-c-on-surface
+        not-disabled:not-aria-disabled:hover:bg-c-surface-container-1-hover
         not-disabled:not-aria-disabled:focus:border-c-primary
-        not-disabled:not-aria-disabled:focus:border-2
+        not-disabled:not-aria-disabled:focus:inset-ring-1
+        not-disabled:not-aria-disabled:focus:inset-ring-c-primary
         not-disabled:not-aria-disabled:focus-within:border-c-primary
-        not-disabled:not-aria-disabled:focus-within:border-2
+        not-disabled:not-aria-disabled:focus-within:inset-ring-1
+        not-disabled:not-aria-disabled:focus-within:inset-ring-c-primary
         focus:outline-none
         focus-within:outline-none
         std-focus
@@ -169,32 +193,32 @@
  */
 @utility surface-1 {
     background: var(--color-c-surface-container-1);
-    @apply text-c-on-surface border border-c-outline-variant rounded-md p-3;
+    @apply text-c-on-surface rounded-md p-3;
 }
 @utility surface-2 {
     background: var(--color-c-surface-container-2);
-    @apply text-c-on-surface border border-c-outline-variant rounded-md p-3;
+    @apply text-c-on-surface rounded-md p-3;
 }
 @utility surface-3 {
     background: var(--color-c-surface-container-3);
-    @apply text-c-on-surface border border-c-outline-variant rounded-md p-3;
+    @apply text-c-on-surface rounded-md p-3;
 }
 @utility surface-4 {
     background: var(--color-c-surface-container-4);
-    @apply text-c-on-surface border border-c-outline-variant rounded-md p-3;
+    @apply text-c-on-surface rounded-md p-3;
 }
 @utility surface-5 {
     background: var(--color-c-surface-container-5);
-    @apply text-c-on-surface border border-c-outline-variant rounded-md p-3;
+    @apply text-c-on-surface rounded-md p-3;
 }
 @utility surface-6 {
     background: var(--color-c-surface-container-6);
-    @apply text-c-on-surface border border-c-outline-variant rounded-md p-3;
+    @apply text-c-on-surface rounded-md p-3;
 }
 
-/* For a box that should sit flush with the page (no tone step) but still
-   needs a drawn boundary. Prefer surface-1..6 for anything stacked. */
-@utility surface-outlined {
+/* Opt-in border: on its own for a box flush with the page, or added to a
+   surface-N that needs a drawn boundary. */
+@utility surface-border {
     @apply text-c-on-surface border border-c-outline-variant rounded-md p-3;
 }
 

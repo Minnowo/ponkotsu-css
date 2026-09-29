@@ -1,4 +1,5 @@
 import type {JSX} from 'preact';
+import {useEffect, useRef, useState} from 'preact/hooks';
 import type {Roles} from '../../build/src/scheme.js';
 
 export function toCssVars(roles: Roles): Record<string, string> {
@@ -118,38 +119,120 @@ export function CategoricalStackedBar({names}: {names: string[]}) {
   );
 }
 
-const LINE_CHART_POINTS = 8;
+// Fake x-axis time labels for the 5 sample points - matches the shape of
+// Karopon's own multi-line graph output, just with made-up data instead of
+// a real query result. Point x positions are computed from the container's
+// actual measured width (see useResizeWidth below) rather than a fixed
+// viewBox stretched with preserveAspectRatio - stretching a non-uniform
+// scale warps circles into ellipses and distorts text, so the geometry is
+// recomputed for the real pixel width instead.
+const LINE_CHART_TIME_LABELS = ['14:17', '15:41', '17:04', '19:49', '11:53'];
+const LINE_CHART_PADDING_LEFT = 40;
+// Wider than the left padding - the last point's value label sits to the
+// right of it (text-anchor="start"), so it needs room to not run off the
+// edge, unlike every other point which only has a small circle there.
+const LINE_CHART_PADDING_RIGHT = 90;
+const LINE_CHART_TOP_MARGIN = 40;
+// Room below the lanes for the x-axis time labels.
+const LINE_CHART_BOTTOM_MARGIN = 50;
+// Keeps a 5-or-fewer-series chart the same height as before; a chart with
+// more series grows taller instead (see lanesHeight below) rather than
+// squeezing each lane down to fit a fixed height.
+const LINE_CHART_DEFAULT_LANES_HEIGHT = 220;
+// Floor on how short a lane is allowed to get - below this a circle and its
+// value label start crowding the lane above/below it.
+const LINE_CHART_MIN_LANE_HEIGHT = 44;
 
-// Deterministic pseudo-random in [0, 1) from a name+index seed - just needs
-// to look varied point-to-point (no real data backs this, it's only here to
-// show how the categorical set reads as chart lines rather than isolated
-// swatches). A plain string hash of `${seed}-${i}` doesn't work for this:
-// since only the trailing digit changes between points, the hash - and so
-// the output - increases almost linearly with i, drawing a straight
-// diagonal instead of noise. Feeding the hash through sin() decorrelates
-// consecutive i's the way classic GLSL-style pseudo-noise does.
-function pseudoRandom(seed: string, i: number): number {
-  let hash = 0;
-  for (const char of seed) hash = (hash * 31 + char.charCodeAt(0)) >>> 0;
-  const x = Math.sin(hash + i * 12.9898) * 43758.5453;
-  return x - Math.floor(x);
+// Tracks an element's rendered content width via ResizeObserver, so an SVG
+// chart can recompute its point positions in real pixels on resize instead
+// of relying on viewBox scaling (which distorts circles/text non-uniformly).
+function useResizeWidth<T extends HTMLElement>(fallback: number) {
+  const ref = useRef<T>(null);
+  const [width, setWidth] = useState(fallback);
+  useEffect(() => {
+    const el = ref.current;
+    if (!el) return;
+    const observer = new ResizeObserver((entries) => {
+      const w = entries[0]?.contentRect.width;
+      if (w) setWidth(w);
+    });
+    observer.observe(el);
+    return () => observer.disconnect();
+  }, []);
+  return {ref, width};
+}
+
+// Deterministic (not random, not per-name) up/down wobble in [0, 1) for a
+// given lane/point pair - a lookup table cycled per lane repeats visibly
+// after only a couple of lanes (every 2-4 lines looking the same shape).
+// Multiplying the lane index by an irrational-ish constant (the golden
+// angle, commonly used for exactly this "don't let a short cycle emerge"
+// property - e.g. phyllotaxis) before feeding it through sin() means the
+// pattern never lines back up on itself, no matter how many lanes there are.
+function laneShape(laneIndex: number, pointIndex: number): number {
+  const phase = laneIndex * 2.399963 + pointIndex * 1.618034;
+  return (Math.sin(phase) + 1) / 2;
 }
 
 export function CategoricalLineChart({names}: {names: string[]}) {
-  const width = 320;
-  const height = 140;
-  const padding = 8;
-  const stepX = (width - padding * 2) / (LINE_CHART_POINTS - 1);
+  const {ref, width} = useResizeWidth<HTMLDivElement>(800);
+  const pointCount = LINE_CHART_TIME_LABELS.length;
+  const pointXs = Array.from(
+      {length: pointCount},
+      (_, i) => LINE_CHART_PADDING_LEFT +
+          (i * (width - LINE_CHART_PADDING_LEFT - LINE_CHART_PADDING_RIGHT)) / (pointCount - 1),
+  );
+
+  // Each series gets its own horizontal band ("lane") to plot its shape
+  // within, rather than sharing the full height - keeps lines from
+  // crossing each other much, since they never leave their own lane. Points
+  // are inset within the lane (not edge-to-edge) so adjacent lanes always
+  // keep a real gap between them instead of their points ever touching.
+  // The chart grows taller (rather than the lanes getting thinner) once
+  // there are more series than fit comfortably at the default height.
+  const lanesHeight = Math.max(LINE_CHART_DEFAULT_LANES_HEIGHT, names.length * LINE_CHART_MIN_LANE_HEIGHT);
+  const chartHeight = LINE_CHART_TOP_MARGIN + lanesHeight + LINE_CHART_BOTTOM_MARGIN;
+  const laneHeight = lanesHeight / names.length;
+  const laneInset = laneHeight * 0.25;
+  const laneUsableHeight = laneHeight - laneInset * 2;
   return (
-    <svg width={width} height={height} class="flex-shrink-0">
-      {names.map((name) => {
-        const points = Array.from({length: LINE_CHART_POINTS}, (_, i) => {
-          const x = padding + i * stepX;
-          const y = padding + pseudoRandom(name, i) * (height - padding * 2);
-          return `${x},${y}`;
-        }).join(' ');
-        return <polyline key={name} points={points} fill="none" stroke={`var(--color-c-${name})`} stroke-width="2" />;
-      })}
-    </svg>
+    <div ref={ref} class="w-full">
+      <svg width={width} height={chartHeight} class="surface-2 p-0 text-c-on-surface-variant">
+        {names.map((name, laneIndex) => {
+          const laneTop = LINE_CHART_TOP_MARGIN + laneIndex * laneHeight + laneInset;
+          const points = pointXs.map((x, i) => {
+            const shape = laneShape(laneIndex, i);
+            return {
+              x,
+              y: laneTop + shape * laneUsableHeight,
+              value: 1 + (names.length - laneIndex) * 10 + shape * 20,
+            };
+          });
+          return (
+            <g key={name}>
+              <polyline
+                fill="none"
+                stroke={`var(--color-c-${name})`}
+                stroke-width="2"
+                points={points.map((p) => `${p.x},${p.y}`).join(' ')}
+              />
+              {points.map((p, i) => (
+                <g key={i}>
+                  <circle cx={p.x} cy={p.y} r="5" fill={`var(--color-c-${name})`} />
+                  <text x={p.x + 5} y={p.y - 5} fill={`var(--color-c-${name})`} class="text-chart-sm" text-anchor="start">
+                    {p.value.toFixed(1)}
+                  </text>
+                </g>
+              ))}
+            </g>
+          );
+        })}
+        {pointXs.map((x, i) => (
+          <text key={i} fill="currentColor" class="text-chart" text-anchor="start" x={x - 5} y={chartHeight - 5}>
+            {LINE_CHART_TIME_LABELS[i]}
+          </text>
+        ))}
+      </svg>
+    </div>
   );
 }

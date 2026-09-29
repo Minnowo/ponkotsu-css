@@ -44,7 +44,8 @@ Clone it, generate a palette once, copy the result into your app's stylesheet.
 on top of them. Together they mean plain markup already looks right and
 you mostly just pick a color/surface class and lay things out.
 
-See the [AGENTS.md](./AGENTS.md) which is a skill for agents.
+See [SKILL.md](./SKILL.md) for how to write markup with it (it doubles as a skill for agents).
+[AGENTS.md](./AGENTS.md) covers working on ponkotsu itself.
 
 ### Base style
 
@@ -75,9 +76,9 @@ Just bump the number each time you nest one box inside another:
 </div>
 ```
 
-If you just need a border without nested shading use `surface-outlined`:
+Surfaces have no border. If a box needs a drawn edge, add `surface-border`:
 ```html
-<div class="surface-outlined">
+<div class="surface-border">
    Some content in a box
 </div>
 ```
