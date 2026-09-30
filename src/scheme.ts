@@ -44,6 +44,12 @@ export interface Seeds {
   dimBaseline?: number;
 }
 
+// Each theme is generated from its own seeds.
+export interface ThemeSeeds {
+  dark: Seeds;
+  light: Seeds;
+}
+
 // The `shift` range (-1..1) is normalized so it means the same thing
 // regardless of theme; this is the actual tone-point swing that maps to.
 // A role near the tone scale's edge (e.g. on-surface at tone 10/90) hits
@@ -221,11 +227,11 @@ const WHEEL_L_CHROMA = 0.75;
 
 // In the light theme d- and the default are dark enough to take light text; l- takes dark text.
 const WHEEL_LIGHT_THEME_TONE = 42;
-const WHEEL_LIGHT_THEME_ON_TONE = 88;
+const WHEEL_LIGHT_THEME_ON_TONE = 85;
 const WHEEL_LIGHT_THEME_L_TONE = 68;
 const WHEEL_LIGHT_THEME_L_ON_TONE = 5;
 const WHEEL_LIGHT_THEME_D_TONE = 30;
-const WHEEL_LIGHT_THEME_D_ON_TONE = 88;
+const WHEEL_LIGHT_THEME_D_ON_TONE = 85;
 
 // Mid tones read as muddy on a light page unless they carry more chroma.
 const WHEEL_LIGHT_THEME_CHROMA = 1.3;

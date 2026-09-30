@@ -10,7 +10,7 @@ properties for Tailwind v4) and ships an opinionated base style on top.
 
 | Path | What |
 |---|---|
-| `src/seeds.json` | Seed colors, `shift` (-1..1 brightness knob) and `dimBaseline` (chroma of the main roles) |
+| `src/seeds.json` | Per theme (`dark`, `light`): seed colors, `shift` (-1..1 brightness knob) and `dimBaseline` (chroma of the main roles) |
 | `src/scheme.ts` | The role table: which palette and tone each `c-*` role comes from, plus the state and categorical colors |
 | `src/generate.ts` | CLI: prints the color blocks followed by `app/src/base.css` |
 | `vendor/` | Vendored material-color-utilities (HCT, tonal palettes). Do not edit |

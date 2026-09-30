@@ -1,7 +1,7 @@
 import type {JSX} from 'preact';
 import {useEffect, useMemo, useState} from 'preact/hooks';
 import {buildScheme, corePaletteFromSeeds} from '../../build/src/scheme.js';
-import type {Seeds} from '../../build/src/scheme.js';
+import type {Seeds, ThemeSeeds} from '../../build/src/scheme.js';
 import baseCss from './base.css?raw';
 import {toCssText, toCssVars} from './controls';
 import {ControlPanel} from './ControlPanel';
@@ -21,14 +21,15 @@ function pageFromHash(hash: string): Page {
 }
 
 export function App() {
-  const [seeds, setSeeds] = useState<Seeds>({
-    primary: "#D2AE61",
-    secondary: '#5AA9E6',
-    tertiary: '#C77DFF',
-    shift: 1,
-    dimBaseline: 0.6,
+  const [themeSeeds, setThemeSeeds] = useState<ThemeSeeds>({
+    dark: {primary: '#D2AE61', secondary: '#5AA9E6', tertiary: '#C77DFF', shift: 1, dimBaseline: 0.6},
+    light: {primary: '#D2AE61', secondary: '#5AA9E6', tertiary: '#C77DFF', shift: 1, dimBaseline: 0.6},
   });
   const [isDark, setIsDark] = useState(true);
+
+  // The controls edit the seeds of whichever theme is being viewed.
+  const seeds = isDark ? themeSeeds.dark : themeSeeds.light;
+  const setSeeds = (next: Seeds) => setThemeSeeds((s) => (isDark ? {...s, dark: next} : {...s, light: next}));
   const [font, setFont] = useState<'M PLUS 1' | 'M PLUS 2'>('M PLUS 1');
   const [copied, setCopied] = useState(false);
   const [page, setPageState] = useState<Page>(() => pageFromHash(window.location.hash));
@@ -45,11 +46,10 @@ export function App() {
   }, []);
 
   const {roles, light, dark} = useMemo(() => {
-    const core = corePaletteFromSeeds(seeds);
-    const light = buildScheme(core, seeds, false);
-    const dark = buildScheme(core, seeds, true);
+    const light = buildScheme(corePaletteFromSeeds(themeSeeds.light), themeSeeds.light, false);
+    const dark = buildScheme(corePaletteFromSeeds(themeSeeds.dark), themeSeeds.dark, true);
     return {roles: isDark ? dark : light, light, dark};
-  }, [seeds, isDark]);
+  }, [themeSeeds, isDark]);
 
   // Mirrors generate.ts's output - always both themes, regardless of which
   // one is currently being viewed.

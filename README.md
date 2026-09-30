@@ -13,20 +13,28 @@ Clone it, generate a palette once, copy the result into your app's stylesheet.
 
 0. Clone the repo
 
-1. Put your 3 colors in `src/seeds.json`:
+1. Put your 3 colors in `src/seeds.json`, once for each theme:
 
    ```json
    {
-     "primary": "#D7BA7D",
-     "secondary": "#5AA9E6",
-     "tertiary": "#C77DFF",
-     "shift": 0
+     "dark": {
+       "primary": "#D7BA7D",
+       "secondary": "#5AA9E6",
+       "tertiary": "#C77DFF",
+       "shift": 0
+     },
+     "light": {
+       "primary": "#D7BA7D",
+       "secondary": "#5AA9E6",
+       "tertiary": "#C77DFF",
+       "shift": 0
+     }
    }
    ```
 
-   You can make dark/light mode darker, or lighter by using the `shift` value,
-   which is a number from -1 to 1 that dims or brightens the generated
-   theme without hurting contrast. 
+   You can make a theme darker or lighter with its `shift` value,
+   which is a number from -1 to 1 that dims or brightens that
+   theme without hurting contrast.
 
 2. `npm install` at least once.
 
