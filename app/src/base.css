@@ -185,6 +185,13 @@
         aria-disabled:pointer-events-none;
 }
 
+/* input-like on a wrapper (a composite field): the wrapper draws hover/focus,
+   the fields inside stay flat. */
+.input-like :is(input, select, textarea, .input-like) {
+    background-color: transparent !important;
+    box-shadow: none !important;
+}
+
 /*
  * surface-N backs onto surface-container-N directly, so the number tells
  * you the tone step - no separate name mapping to remember. Starts at 1,

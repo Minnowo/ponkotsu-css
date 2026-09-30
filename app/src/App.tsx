@@ -25,7 +25,7 @@ export function App() {
     primary: "#D2AE61",
     secondary: '#5AA9E6',
     tertiary: '#C77DFF',
-    shift: 0.3,
+    shift: 1,
     dimBaseline: 0.6,
   });
   const [isDark, setIsDark] = useState(true);
@@ -55,7 +55,7 @@ export function App() {
   // one is currently being viewed.
   const cssText =
       `@import 'tailwindcss';\n\n` +
-      `@theme {\n    --color-*: initial;\n${toCssText(dark, '    ')}\n}\n\n` +
+      `@theme static {\n    --color-*: initial;\n${toCssText(dark, '    ')}\n}\n\n` +
       `[data-theme='light'] {\n${toCssText(light, '    ')}\n}\n\n${baseCss}`;
 
   const copyCss = async () => {

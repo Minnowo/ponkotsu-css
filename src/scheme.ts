@@ -202,27 +202,33 @@ export type Roles = Record<string, string>;
 // page that's a similarly high tone - so light theme needs a much lower
 // (darker) chip tone to actually contrast against its own near-white
 // background, the same reason primary/secondary/tertiary flip their tone
-// between themes. The on-tone flips to match, same as primary/secondary's
-// on-* pair - dark theme's pale chip pairs with dark text (tone 20), light
-// theme's darker chip pairs with light text (tone 95); mixing the two
-// (e.g. dark text on light theme's dark chip) reads low-contrast, same
-// failure mode noted below for btn-error/btn-success.
+// between themes. Both themes pair their chips with dark text; white text
+// on a mid-tone light theme chip read washed out.
 // (this is what made btn-error/btn-success look off in dark mode - their
 // bg/text were built from this pair, and on-tone 95 on a tone-65 bg was
 // under 3:1 contrast).
-const WHEEL_DARK_THEME_TONE = 80;
-const WHEEL_DARK_THEME_ON_TONE = 20;
-const WHEEL_DARK_THEME_L_TONE = 87;
-const WHEEL_DARK_THEME_L_ON_TONE = 20;
-const WHEEL_DARK_THEME_D_TONE = 72;
-const WHEEL_DARK_THEME_D_ON_TONE = 20;
+const WHEEL_DARK_THEME_TONE = 71;
+const WHEEL_DARK_THEME_ON_TONE = 10;
+const WHEEL_DARK_THEME_L_TONE = 80;
+const WHEEL_DARK_THEME_L_ON_TONE = 10;
+const WHEEL_DARK_THEME_D_TONE = 62;
+const WHEEL_DARK_THEME_D_ON_TONE = 10;
 
-const WHEEL_LIGHT_THEME_TONE = 56;
-const WHEEL_LIGHT_THEME_ON_TONE = 95;
-const WHEEL_LIGHT_THEME_L_TONE = 64;
-const WHEEL_LIGHT_THEME_L_ON_TONE = 95;
-const WHEEL_LIGHT_THEME_D_TONE = 48;
-const WHEEL_LIGHT_THEME_D_ON_TONE = 95;
+// Variants also differ in chroma, so they stay distinct at any tone:
+// d- is a deeper shade, l- a paler tint.
+const WHEEL_D_CHROMA = 1.2;
+const WHEEL_L_CHROMA = 0.75;
+
+// In the light theme d- and the default are dark enough to take light text; l- takes dark text.
+const WHEEL_LIGHT_THEME_TONE = 42;
+const WHEEL_LIGHT_THEME_ON_TONE = 88;
+const WHEEL_LIGHT_THEME_L_TONE = 68;
+const WHEEL_LIGHT_THEME_L_ON_TONE = 5;
+const WHEEL_LIGHT_THEME_D_TONE = 30;
+const WHEEL_LIGHT_THEME_D_ON_TONE = 88;
+
+// Mid tones read as muddy on a light page unless they carry more chroma.
+const WHEEL_LIGHT_THEME_CHROMA = 1.3;
 
 // MD3's "state layer": hover/focus on a filled button tints the fill with
 // a translucent wash of the button's own on-* color (8% hover, 12%
@@ -340,12 +346,13 @@ const ROLE_SPECS: Record<string, RoleSpec> = {
   // steps 5/6, so this repo dropped the names entirely rather than mix
   // named and numbered. No surface-container-0: MD3's "lowest" tone wasn't
   // used by anything (nothing nests below surface-1), so it's not generated.
-  'surface-container-1': {axis: 'n', lightTone: 96, darkTone: 10},
-  'surface-container-2': {axis: 'n', lightTone: 94, darkTone: 12},
-  'surface-container-3': {axis: 'n', lightTone: 92, darkTone: 17},
-  'surface-container-4': {axis: 'n', lightTone: 90, darkTone: 22},
-  'surface-container-5': {axis: 'n', lightTone: 88, darkTone: 27},
-  'surface-container-6': {axis: 'n', lightTone: 86, darkTone: 32},
+  // Dark steps are 5 tones apart: smaller steps vanish on phone screens.
+  'surface-container-1': {axis: 'n', lightTone: 96, darkTone: 11},
+  'surface-container-2': {axis: 'n', lightTone: 94, darkTone: 16},
+  'surface-container-3': {axis: 'n', lightTone: 92, darkTone: 21},
+  'surface-container-4': {axis: 'n', lightTone: 90, darkTone: 26},
+  'surface-container-5': {axis: 'n', lightTone: 88, darkTone: 31},
+  'surface-container-6': {axis: 'n', lightTone: 86, darkTone: 36},
   'surface-dim': {axis: 'n', lightTone: 87, darkTone: 6},
   'surface-bright': {axis: 'n', lightTone: 98, darkTone: 24},
   'outline': {axis: 'nv', lightTone: 50, darkTone: 60},
@@ -399,7 +406,7 @@ export function buildScheme(
   // out of saturation-sync with primary/secondary/tertiary as dimBaseline
   // moved - tying it to primary's own chroma keeps them matched at every
   // dimBaseline value, not just the one they happened to be tuned at.
-  const categoricalChromaFactor = dimBaseline*1.5;
+  const categoricalChromaFactor = dimBaseline * 1.5 * (isDark ? 1 : WHEEL_LIGHT_THEME_CHROMA);
   const primaryChroma = axisPalette.p.chroma;
   const wheelTone = isDark ? WHEEL_DARK_THEME_TONE : WHEEL_LIGHT_THEME_TONE;
   const wheelOnTone = isDark ? WHEEL_DARK_THEME_ON_TONE : WHEEL_LIGHT_THEME_ON_TONE;
@@ -414,11 +421,11 @@ export function buildScheme(
     roles[`on-${name}`] = hexFromArgb(palette.tone(clampTone(wheelOnTone + wheelShiftTone)));
 
     // literally just randomly shifted this, seems good enough
-    const paletteD = TonalPalette.fromHueAndChroma(((360+harmonized.hue-16)%360), primaryChroma * categoricalChromaFactor);
+    const paletteD = TonalPalette.fromHueAndChroma(((360+harmonized.hue-16)%360), primaryChroma * categoricalChromaFactor * WHEEL_D_CHROMA);
     roles[`d-${name}`] = hexFromArgb(paletteD.tone(clampTone(wheelDTone + wheelShiftTone)));
     roles[`on-d-${name}`] = hexFromArgb(paletteD.tone(clampTone(wheelDOnTone + wheelShiftTone)));
 
-    const paletteL = TonalPalette.fromHueAndChroma(((360+harmonized.hue)%360), primaryChroma * categoricalChromaFactor);
+    const paletteL = TonalPalette.fromHueAndChroma(((360+harmonized.hue)%360), primaryChroma * categoricalChromaFactor * WHEEL_L_CHROMA);
     roles[`l-${name}`] = hexFromArgb(paletteL.tone(clampTone(wheelLTone + wheelShiftTone)));
     roles[`on-l-${name}`] = hexFromArgb(paletteL.tone(clampTone(wheelLOnTone + wheelShiftTone)));
   }

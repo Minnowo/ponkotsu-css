@@ -4,6 +4,7 @@ import {CategoricalPieChart} from './controls';
 const NAV_ITEMS = [
   {id: 'dashboard', label: 'Dashboard'},
   {id: 'workout', label: 'Workout'},
+  {id: 'tags', label: 'Tags'},
   {id: 'settings', label: 'Settings'},
 ] as const;
 type NavId = (typeof NAV_ITEMS)[number]['id'];
@@ -409,6 +410,151 @@ function WorkoutView() {
   );
 }
 
+const COLOR_VARS = ['pink', 'red', 'yellow', 'green', 'blue'].flatMap((n) => [
+  `--color-c-${n}`,
+  `--color-c-l-${n}`,
+  `--color-c-d-${n}`,
+]);
+
+const DEMO_TAGS = [
+  'work:development',
+  'work:meetings',
+  'project:karopon',
+  'project:ponkotsu',
+  'issue:312',
+  'cardio:jumping_jack',
+  'cardio:running',
+  'workout:leg_day',
+];
+
+const DEMO_TAG_COLORS: Record<string, string> = {
+  work: '--color-c-blue',
+  project: '--color-c-d-green',
+  issue: '--color-c-red',
+  cardio: '--color-c-l-yellow',
+  workout: '--color-c-pink',
+};
+
+const reColorHex = /^#([0-9A-Fa-f]{3}|[0-9A-Fa-f]{6})$/;
+const reColorCSSVar = /^--[a-zA-Z][a-zA-Z0-9-]*$/;
+const isValidColor = (v: string) => v.length > 0 && (reColorHex.test(v) || reColorCSSVar.test(v));
+
+const fmtTagColor = (v: string) => (v.startsWith('-') ? `var(${v})` : v);
+
+// Mirrors karopon's TagChip: a theme color gets its on-* pair as text.
+function TagChip({tag, color}: {tag: string; color?: string}) {
+  const bg = color && isValidColor(color) ? fmtTagColor(color) : 'var(--color-c-pink)';
+  const role = bg.match(/^var\(--color-c-([\w-]+)\)$/)?.[1];
+  const text = role ? `var(--color-c-on-${role})` : undefined;
+  return (
+    <span class="flex items-center min-h-8 rounded w-fit px-3" style={{backgroundColor: bg, color: text}}>
+      {tag}
+    </span>
+  );
+}
+
+function TagsView() {
+  const [colors, setColors] = useState<Record<string, string>>(DEMO_TAG_COLORS);
+  const [showColors, setShowColors] = useState(true);
+  const [search, setSearch] = useState('');
+  const namespaces = Object.keys(DEMO_TAG_COLORS);
+  const shown = DEMO_TAGS.filter((t) => t.includes(search.trim()));
+
+  return (
+    <div class="flex flex-col gap-4">
+      <div class="flex flex-wrap justify-evenly gap-2">
+        <button>New Tag</button>
+        <button disabled={showColors} onClick={() => setShowColors(true)}>
+          Tag Colors
+        </button>
+      </div>
+
+      {showColors && (
+        <div class="surface-1 flex flex-col gap-2">
+          <details class="w-full">
+            <summary class="cursor-pointer">
+              <h2 class="inline">Tag Colors</h2>
+              <small> (click for help)</small>
+            </summary>
+            <div class="flex flex-col gap-2 pt-2">
+              <p>
+                Assign a color to each namespace. Accepts hex (<code>#rgb</code>, <code>#rrggbb</code>) or a CSS
+                variable name (<code>--xyz</code>). Leave empty to remove a color.
+              </p>
+              <p>Below are the variable names available, the colors change with the color theme.</p>
+              <ul class="flex flex-col gap-2">
+                {COLOR_VARS.map((v) => (
+                  <li key={v} class="flex items-center gap-2">
+                    <span class="w-6 h-6 rounded" style={{background: `var(${v})`}} />
+                    <code>{v}</code>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          </details>
+
+          {namespaces.map((ns) => {
+            const value = colors[ns] ?? '';
+            const invalid = value.trim() !== '' && !isValidColor(value.trim());
+            return (
+              <div key={ns} class="flex flex-wrap justify-between items-center gap-2">
+                <div class="flex items-center gap-2 min-w-0">
+                  <span
+                    class="w-6 h-6 rounded flex-shrink-0"
+                    style={{backgroundColor: invalid ? 'transparent' : fmtTagColor(value.trim())}}
+                  />
+                  <code class="break-all">{ns}</code>
+                </div>
+                <div class="flex flex-col gap-1 min-w-40">
+                  <input
+                    type="text"
+                    class="w-64 font-mono"
+                    placeholder="#rrggbb or --name"
+                    aria-label={`Color for ${ns}`}
+                    value={value}
+                    onInput={(e) => setColors((c) => ({...c, [ns]: (e.target as HTMLInputElement).value}))}
+                  />
+                  {invalid && <small class="text-c-error">Must be #rgb, #rrggbb, or --name</small>}
+                </div>
+              </div>
+            );
+          })}
+
+          <div class="flex gap-2 justify-end">
+            <button onClick={() => setShowColors(false)}>Cancel</button>
+            <button class="btn-success" onClick={() => setShowColors(false)}>
+              Save
+            </button>
+          </div>
+        </div>
+      )}
+
+      <input
+        type="text"
+        placeholder="Search tags..."
+        aria-label="Search tags"
+        value={search}
+        onInput={(e) => setSearch((e.target as HTMLInputElement).value)}
+      />
+
+      <div class="flex flex-col gap-2">
+        {shown.length === 0 ? (
+          <p>No tags match your search.</p>
+        ) : (
+          shown.map((t) => (
+            <div key={t} class="surface-1 flex items-center gap-2">
+              <div class="flex-1">
+                <TagChip tag={t} color={colors[t.split(':')[0]]?.trim()} />
+              </div>
+              <button>Edit</button>
+            </div>
+          ))
+        )}
+      </div>
+    </div>
+  );
+}
+
 export function FakeApp() {
   const [nav, setNav] = useState<NavId>('dashboard');
 
@@ -423,6 +569,7 @@ export function FakeApp() {
       <main class="flex-1 min-w-0">
         {nav === 'dashboard' && <DashboardView />}
         {nav === 'workout' && <WorkoutView />}
+        {nav === 'tags' && <TagsView />}
         {nav === 'settings' && <SettingsView />}
       </main>
     </div>
