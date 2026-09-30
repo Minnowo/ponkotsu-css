@@ -23,7 +23,7 @@ function pageFromHash(hash: string): Page {
 export function App() {
   const [themeSeeds, setThemeSeeds] = useState<ThemeSeeds>({
     dark: {primary: '#D2AE61', secondary: '#5AA9E6', tertiary: '#C77DFF', shift: 1, dimBaseline: 0.6},
-    light: {primary: '#D2AE61', secondary: '#5AA9E6', tertiary: '#C77DFF', shift: 1, dimBaseline: 0.6},
+    light: {primary: '#D2AE61', secondary: '#5AA9E6', tertiary: '#C77DFF', shift: -1, dimBaseline: 0.6},
   });
   const [isDark, setIsDark] = useState(true);
 
