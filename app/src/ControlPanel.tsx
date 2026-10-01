@@ -34,7 +34,7 @@ export function ControlPanel({
         <div class="surface-1 flex flex-col gap-3 w-full max-w-72 max-h-[70vh] overflow-y-auto">
           <div class="flex items-center justify-between">
             <h4>Theme controls</h4>
-            <button class="btn-outlined" onClick={() => onDarkChange(!isDark)}>
+            <button onClick={() => onDarkChange(!isDark)}>
               {isDark ? 'Dark' : 'Light'}
             </button>
           </div>
@@ -64,7 +64,7 @@ export function ControlPanel({
           />
 
           <div class="flex items-center justify-between gap-2">
-            <button class="btn-outlined" onClick={() => onFontChange(font === 'M PLUS 1' ? 'M PLUS 2' : 'M PLUS 1')}>
+            <button onClick={() => onFontChange(font === 'M PLUS 1' ? 'M PLUS 2' : 'M PLUS 1')}>
               Font: {font}
             </button>
             <button class="btn-primary" onClick={onCopyCss}>

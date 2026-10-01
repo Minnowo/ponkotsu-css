@@ -15,7 +15,7 @@ function NavLinks({active, onSelect, class: className}: {active: NavId; onSelect
       {NAV_ITEMS.map((item) => (
         <button
           key={item.id}
-          class={active === item.id ? 'btn-primary' : 'btn-outlined'}
+          class={active === item.id ? 'btn-primary' : undefined}
           onClick={() => onSelect(item.id)}
         >
           {item.label}

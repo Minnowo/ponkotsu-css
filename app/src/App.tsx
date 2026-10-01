@@ -74,10 +74,10 @@ export function App() {
   return (
     <div style={pageStyle} class="min-h-screen bg-c-surface text-c-on-surface">
       <div class="flex justify-center gap-1 p-3 border-b border-c-outline-variant">
-        <button class={page === 'app' ? 'btn-primary' : 'btn-outlined'} onClick={() => setPage('app')}>
+        <button class={page === 'app' ? 'btn-primary' : undefined} onClick={() => setPage('app')}>
           Theme Preview
         </button>
-        <button class={page === 'reference' ? 'btn-primary' : 'btn-outlined'} onClick={() => setPage('reference')}>
+        <button class={page === 'reference' ? 'btn-primary' : undefined} onClick={() => setPage('reference')}>
           Reference
         </button>
       </div>
